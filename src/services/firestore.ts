@@ -1,0 +1,94 @@
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  type DocumentData,
+} from 'firebase/firestore'
+import { db, DEMO_MODE } from './firebase'
+
+type Unsubscribe = () => void
+
+export function subscribeCollection<T>(
+  collectionName: string,
+  onData: (items: T[]) => void,
+  sortField?: string
+): Unsubscribe {
+  if (DEMO_MODE) {
+    const stored = localStorage.getItem(collectionName)
+    onData(stored ? JSON.parse(stored) : [])
+    return () => {}
+  }
+
+  if (!db) return () => {}
+
+  const ref = collection(db, collectionName)
+  const q = sortField ? query(ref, orderBy(sortField, 'desc')) : ref
+
+  return onSnapshot(q, (snapshot) => {
+    const items = snapshot.docs.map((d) => ({
+      ...d.data(),
+      docId: d.id,
+    })) as T[]
+    onData(items)
+  })
+}
+
+export async function addDocument<T extends DocumentData>(
+  collectionName: string,
+  data: T
+): Promise<string> {
+  if (DEMO_MODE) {
+    const stored = JSON.parse(localStorage.getItem(collectionName) || '[]')
+    const newItem = { ...data, id: Date.now() }
+    stored.push(newItem)
+    localStorage.setItem(collectionName, JSON.stringify(stored))
+    return String(newItem.id)
+  }
+
+  if (!db) throw new Error('Firestore not configured')
+  const docRef = await addDoc(collection(db, collectionName), data)
+  return docRef.id
+}
+
+export async function updateDocument(
+  collectionName: string,
+  docId: string,
+  data: Partial<DocumentData>
+): Promise<void> {
+  if (DEMO_MODE) {
+    const stored = JSON.parse(localStorage.getItem(collectionName) || '[]')
+    const idx = stored.findIndex((item: { id?: number; docId?: string }) =>
+      item.docId === docId || String(item.id) === docId
+    )
+    if (idx !== -1) {
+      stored[idx] = { ...stored[idx], ...data }
+      localStorage.setItem(collectionName, JSON.stringify(stored))
+    }
+    return
+  }
+
+  if (!db) throw new Error('Firestore not configured')
+  await updateDoc(doc(db, collectionName, docId), data)
+}
+
+export async function deleteDocument(
+  collectionName: string,
+  docId: string
+): Promise<void> {
+  if (DEMO_MODE) {
+    const stored = JSON.parse(localStorage.getItem(collectionName) || '[]')
+    const filtered = stored.filter((item: { id?: number; docId?: string }) =>
+      item.docId !== docId && String(item.id) !== docId
+    )
+    localStorage.setItem(collectionName, JSON.stringify(filtered))
+    return
+  }
+
+  if (!db) throw new Error('Firestore not configured')
+  await deleteDoc(doc(db, collectionName, docId))
+}

@@ -1,6 +1,19 @@
-# Firebase local cache
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Firebase
 .firebase/
 firebase-debug.log
 
 # OS
 .DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env.local
