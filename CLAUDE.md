@@ -1,62 +1,117 @@
 # CLAUDE.md
 
-Цей файл надає інструкції Claude Code (claude.ai/code) для роботи з цим репозиторієм.
+Інструкції для Claude Code при роботі з цим репозиторієм.
 
 ## Огляд проєкту
 
-**Betblock v2.0** — це односторінковий застосунок (SPA) для управління виробництвом і обліку запасів на підприємстві з виробництва будівельних блоків. Інтерфейс — українською мовою. Весь застосунок міститься в одному файлі: `index-firebase-v2.html`.
+**Betblock v3.0** — SPA для управління виробництвом та обліку на підприємстві з виробництва будівельних блоків. Інтерфейс — українською мовою. Mobile-first дизайн.
+
+## Стек
+
+- **Vite + React 19 + TypeScript** — збірка та фреймворк
+- **Tailwind CSS v4** — стилі (через `@tailwindcss/vite` плагін)
+- **Firebase v12** — Auth + Firestore + Analytics + Hosting
+- **lucide-react** — іконки
+- **recharts** — графіки на дашборді
+- **sonner** — toast нотифікації
+- **xlsx (SheetJS)** — експорт в Excel
 
 ## Як запустити
 
-Відкрити `index-firebase-v2.html` безпосередньо в браузері — збірка не потрібна. Залежності (React 18, Tailwind CSS, Firebase, Babel, SheetJS) завантажуються з CDN. JSX компілюється в браузері через Babel Standalone.
+```bash
+npm install
+npm run dev       # Dev server на localhost:5173
+npm run build     # Production build → dist/
+npm run preview   # Preview production build
+```
 
-Немає package.json, лінтера та тестового фреймворку.
+## Два режими роботи
+
+- **Firebase-режим** (за замовчуванням): Firestore + Auth. Конфіг у `src/services/firebase.ts`
+- **Демо-режим**: localStorage, активується якщо Firebase не налаштовано. Демо-акаунти: `admin@example.com` / `manager@example.com` / `worker@example.com` (пароль: будь-який)
 
 ## Архітектура
 
-### Структура одного файлу
-
-Весь HTML, CSS (Tailwind), React-компоненти та бізнес-логіка знаходяться в `index-firebase-v2.html` (~1800 рядків).
-
-### Два режими роботи
-
-- **Демо-режим**: дані зберігаються в `localStorage` (ключі: `inventory`, `products`, `production`, `orders`, `sales`, `expenses`, `currentUser`)
-- **Firebase-режим**: синхронізація в реальному часі через Firestore; конфіг Firebase знаходиться на початку файлу (рядки 27–34)
-
-### Ієрархія React-компонентів
+### Структура
 
 ```
-LoginScreen
-ProductionApp  (головний контейнер стану)
-├── DashboardTab
-├── InventoryTab
-├── ProductsTab
-├── ProductionTab
-├── OrdersTab
-├── SalesTab      (тільки admin/manager)
-└── ExpensesTab   (тільки admin/manager)
+src/
+├── App.tsx                         # Root: ErrorBoundary → AuthProvider → TabRouter
+├── main.tsx                        # Entry point
+├── types/index.ts                  # Всі TypeScript інтерфейси
+├── services/
+│   ├── firebase.ts                 # Firebase init + Analytics logEvent()
+│   ├── auth.ts                     # signIn/signOut/onAuthStateChanged (demo + firebase)
+│   └── firestore.ts                # Generic CRUD + realtime subscriptions (demo + firebase)
+├── contexts/
+│   ├── AuthContext.tsx              # User + role + canEdit()/canViewFinances()
+│   └── DataContext.tsx              # 6 колекцій + addItem/updateItem/deleteItem з toasts
+├── hooks/
+│   ├── useDarkMode.ts              # Dark mode toggle + localStorage
+│   └── useExport.ts                # Excel + JSON export
+├── components/
+│   ├── layout/                     # AppShell, Header, BottomNav, Sidebar
+│   ├── auth/LoginScreen.tsx
+│   ├── dashboard/                  # DashboardPage, StatsCards, InventoryAlerts, FinanceSummary, ProductionChart
+│   ├── inventory/                  # InventoryPage + List + Form
+│   ├── products/                   # ProductsPage + Card + Form
+│   ├── production/                 # ProductionPage + List + Form
+│   ├── orders/                     # OrdersPage + List + Form + StatusBadge
+│   ├── sales/                      # SalesPage + List + Form
+│   ├── expenses/                   # ExpensesPage + List + Form
+│   └── shared/                     # FAB, Sheet, ConfirmDialog, EmptyState, SearchBar, StatusFilter, ErrorBoundary, FeedbackButton
+├── lib/
+│   ├── utils.ts                    # cn(), formatDate(), formatCurrency(), todayISO()
+│   ├── constants.ts                # SHIFTS, ORDER_STATUSES, EXPENSE_CATEGORIES, defaults
+│   └── stats.ts                    # calculateProductStats(), calculateFinancialStats()
+└── styles/globals.css              # Tailwind @theme + dark mode overrides
 ```
 
-Стан керується через React-хуки (`useState`, `useEffect`) і передається через props. Зовнішні бібліотеки стану не використовуються.
+### Path alias
+
+`@/` → `./src/` (налаштовано в `vite.config.ts` + `tsconfig.app.json`)
+
+### Навігація
+
+Tab-based через `useState` в `App.tsx` — без React Router.
+- **Мобільна**: BottomNav (5 вкладок) + "Ще" Sheet (Продажі, Витрати, Продукція)
+- **Десктоп**: Sidebar зліва
 
 ### Рольовий доступ
 
-Три ролі, що зберігаються у Firestore `users/{uid}.role`:
-- `admin` — повний доступ, включаючи управління користувачами
-- `manager` — може редагувати дані, без управління користувачами
-- `worker` — лише читання; може додавати записи виробництва
-
-Допоміжні функції: `canEdit()` та `canViewFinances()`.
+Firestore `users/{uid}.role`:
+- `admin` — повний доступ
+- `manager` — редагування, без управління юзерами
+- `worker` — читання + додавання виробництва
 
 ### Колекції Firestore
 
-`inventory`, `products`, `production`, `orders`, `sales`, `expenses`, `users`
+`inventory`, `products`, `production`, `orders`, `sales`, `expenses`, `users`, `errors`, `feedback`
 
-### Конфігурація Firebase
+## CI/CD
 
-Замінити рядки-заповнювачі в об'єкті `firebaseConfig` на початку `index-firebase-v2.html` реальними даними проєкту. Правила безпеки Firestore описані у `ІНСТРУКЦІЯ-V2.md`.
+- GitHub Actions: `.github/workflows/firebase-hosting-merge.yml` (deploy on push to main)
+- PR previews: `.github/workflows/firebase-hosting-pull-request.yml`
+- Firebase project: `shlakoblock-ebf35`
+- Secret: `FIREBASE_SERVICE_ACCOUNT_SHLAKOBLOCK_EBF35`
 
-## Документація
+## PWA
 
-- `ІНСТРУКЦІЯ-V2.md` — повний посібник з налаштування: Firebase, правила Firestore, розгортання на Vercel
-- `ШВИДКА-ДОВІДКА-V2.md` — швидка довідка: огляд функцій, демо-облікові дані, поради
+- `public/manifest.json` — Web App Manifest
+- `public/sw.js` — Service Worker (network-first, cache fallback)
+- Іконки: `public/icon-192.png`, `public/icon-512.png`
+
+## Аналітика
+
+- **Firebase Analytics**: login, page_view, create_record, delete_record, export, feedback_sent
+- **Error tracking**: ErrorBoundary → Firestore `errors` collection
+- **Feedback**: FeedbackButton у Header → Firestore `feedback` collection
+
+## Стара версія
+
+`index-firebase-v2.html` — повна v2 версія (один файл, 1807 рядків) збережена для rollback.
+
+## Документація (v2, застаріла)
+
+- `ІНСТРУКЦІЯ-V2.md` — налаштування Firebase, Firestore rules
+- `ШВИДКА-ДОВІДКА-V2.md` — огляд функцій v2
