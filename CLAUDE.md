@@ -107,11 +107,6 @@ Firestore `users/{uid}.role`:
 - **Error tracking**: ErrorBoundary → Firestore `errors` collection
 - **Feedback**: FeedbackButton у Header → Firestore `feedback` collection
 
-## Стара версія
+## Firestore Rules
 
-`index-firebase-v2.html` — повна v2 версія (один файл, 1807 рядків) збережена для rollback.
-
-## Документація (v2, застаріла)
-
-- `ІНСТРУКЦІЯ-V2.md` — налаштування Firebase, Firestore rules
-- `ШВИДКА-ДОВІДКА-V2.md` — огляд функцій v2
+`firestore.rules` — правила безпеки Firestore, деплояться через `firebase deploy --only firestore:rules`.
