@@ -19,9 +19,16 @@ export function subscribeCollection<T>(
   sortField?: string
 ): Unsubscribe {
   if (DEMO_MODE) {
-    const stored = localStorage.getItem(collectionName)
-    onData(stored ? JSON.parse(stored) : [])
-    return () => {}
+    const load = () => {
+      const stored = localStorage.getItem(collectionName)
+      onData(stored ? JSON.parse(stored) : [])
+    }
+    load()
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === collectionName) load()
+    }
+    window.addEventListener('demo-data-change', handler)
+    return () => window.removeEventListener('demo-data-change', handler)
   }
 
   if (!db) return () => {}
@@ -45,8 +52,10 @@ export async function addDocument<T extends DocumentData>(
   if (DEMO_MODE) {
     const stored = JSON.parse(localStorage.getItem(collectionName) || '[]')
     const newItem = { ...data, id: Date.now() }
-    stored.push(newItem)
+    stored.unshift(newItem)
     localStorage.setItem(collectionName, JSON.stringify(stored))
+    // Notify subscribers
+    window.dispatchEvent(new CustomEvent('demo-data-change', { detail: collectionName }))
     return String(newItem.id)
   }
 
@@ -68,6 +77,7 @@ export async function updateDocument(
     if (idx !== -1) {
       stored[idx] = { ...stored[idx], ...data }
       localStorage.setItem(collectionName, JSON.stringify(stored))
+      window.dispatchEvent(new CustomEvent('demo-data-change', { detail: collectionName }))
     }
     return
   }
@@ -86,6 +96,7 @@ export async function deleteDocument(
       item.docId !== docId && String(item.id) !== docId
     )
     localStorage.setItem(collectionName, JSON.stringify(filtered))
+    window.dispatchEvent(new CustomEvent('demo-data-change', { detail: collectionName }))
     return
   }
 

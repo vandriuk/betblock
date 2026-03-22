@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Header } from './Header'
 import { BottomNav, type TabId } from './BottomNav'
 import { Sidebar } from './Sidebar'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { PullToRefreshIndicator } from '@/components/shared/PullToRefresh'
 
 interface AppShellProps {
   activeTab: TabId
@@ -13,6 +15,14 @@ interface AppShellProps {
 export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   const { canViewFinances } = useAuth()
   const [moreOpen, setMoreOpen] = useState(false)
+
+  const handleRefresh = useCallback(async () => {
+    // Trigger a page reload to re-fetch Firestore data
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    window.location.reload()
+  }, [])
+
+  const { containerRef, pullDistance, refreshing } = usePullToRefresh({ onRefresh: handleRefresh })
 
   const handleMoreClick = () => {
     setMoreOpen(true)
@@ -35,7 +45,8 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
       />
 
       {/* Main content */}
-      <main className="pb-20 md:pb-4 md:pl-64">
+      <main ref={containerRef} className="pb-20 md:pb-4 md:pl-64 overflow-y-auto">
+        <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
         <div className="max-w-5xl mx-auto p-4">
           {children}
         </div>

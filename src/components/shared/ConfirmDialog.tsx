@@ -12,8 +12,8 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Видал
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
-      <div className="relative bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+      <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onCancel} />
+      <div className="relative bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-fade-scale-in">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <p className="text-sm text-gray-500 mt-2">{message}</p>
         <div className="flex gap-3 mt-6">
