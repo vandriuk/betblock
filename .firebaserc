@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "shlakoblock-ebf35"
+  },
+  "targets": {
+    "shlakoblock-ebf35": {
+      "hosting": {
+        "betblock": [
+          "shlakoblock-ebf35"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
