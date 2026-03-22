@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
@@ -6,14 +6,23 @@ import { DataProvider } from '@/contexts/DataContext'
 import { logEvent } from '@/services/firebase'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { AppShell } from '@/components/layout/AppShell'
-import { DashboardPage } from '@/components/dashboard/DashboardPage'
-import { InventoryPage } from '@/components/inventory/InventoryPage'
-import { ProductsPage } from '@/components/products/ProductsPage'
-import { ProductionPage } from '@/components/production/ProductionPage'
-import { OrdersPage } from '@/components/orders/OrdersPage'
-import { SalesPage } from '@/components/sales/SalesPage'
-import { ExpensesPage } from '@/components/expenses/ExpensesPage'
 import type { TabId } from '@/components/layout/BottomNav'
+
+const DashboardPage = lazy(() => import('@/components/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const InventoryPage = lazy(() => import('@/components/inventory/InventoryPage').then(m => ({ default: m.InventoryPage })))
+const ProductsPage = lazy(() => import('@/components/products/ProductsPage').then(m => ({ default: m.ProductsPage })))
+const ProductionPage = lazy(() => import('@/components/production/ProductionPage').then(m => ({ default: m.ProductionPage })))
+const OrdersPage = lazy(() => import('@/components/orders/OrdersPage').then(m => ({ default: m.OrdersPage })))
+const SalesPage = lazy(() => import('@/components/sales/SalesPage').then(m => ({ default: m.SalesPage })))
+const ExpensesPage = lazy(() => import('@/components/expenses/ExpensesPage').then(m => ({ default: m.ExpensesPage })))
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <div className="animate-pulse text-primary-600 text-sm">Завантаження...</div>
+    </div>
+  )
+}
 
 function AppContent() {
   const { user, loading } = useAuth()
@@ -49,7 +58,9 @@ function AppContent() {
   return (
     <DataProvider>
       <AppShell activeTab={activeTab} onTabChange={handleTabChange}>
-        {pages[activeTab]}
+        <Suspense fallback={<PageLoader />}>
+          {pages[activeTab]}
+        </Suspense>
       </AppShell>
     </DataProvider>
   )

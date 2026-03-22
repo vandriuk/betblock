@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuth() { return request.auth != null; }
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function isAdmin() { return getUserRole() == 'admin'; }
+    function isManager() { return getUserRole() == 'manager'; }
+    function canEdit() { return isAdmin() || isManager(); }
+
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+    match /inventory/{doc} { allow read: if isAuth(); allow write: if canEdit(); }
+    match /products/{doc} { allow read: if isAuth(); allow write: if canEdit(); }
+    match /production/{doc} { allow read: if isAuth(); allow write: if isAuth(); }
+    match /orders/{doc} { allow read: if isAuth(); allow write: if canEdit(); }
+    match /sales/{doc} { allow read: if isAuth() && canEdit(); allow write: if canEdit(); }
+    match /expenses/{doc} { allow read: if isAuth() && canEdit(); allow write: if canEdit(); }
+    match /errors/{doc} { allow create: if isAuth(); }
+    match /feedback/{doc} { allow create: if isAuth(); allow read: if isAdmin(); }
+  }
+}
