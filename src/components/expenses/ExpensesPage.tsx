@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { ExpensesList } from './ExpensesList'
@@ -7,13 +7,28 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
-import type { Expense } from '@/types'
+import { SearchBar } from '@/components/shared/SearchBar'
+import { StatusFilter } from '@/components/shared/StatusFilter'
+import { EXPENSE_CATEGORIES } from '@/lib/constants'
+import type { Expense, ExpenseCategory } from '@/types'
 
 export function ExpensesPage() {
   const { expenses, addItem, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Expense | null>(null)
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | null>(null)
+
+  const filtered = useMemo(() => {
+    let result = expenses
+    if (categoryFilter) result = result.filter((e) => e.category === categoryFilter)
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter((e) => e.description.toLowerCase().includes(q))
+    }
+    return result
+  }, [expenses, categoryFilter, search])
 
   const handleAdd = async (data: Omit<Expense, 'id' | 'docId'>) => {
     await addItem('expenses', data)
@@ -34,10 +49,24 @@ export function ExpensesPage() {
         <p className="text-sm text-gray-500 mt-0.5">Облік витрат підприємства</p>
       </div>
 
-      {expenses.length === 0 ? (
-        <EmptyState title="Немає витрат" message="Додайте першу витрату" />
+      {expenses.length > 0 && (
+        <div className="space-y-3">
+          <SearchBar value={search} onChange={setSearch} placeholder="Пошук за описом..." />
+          <StatusFilter
+            options={EXPENSE_CATEGORIES}
+            selected={categoryFilter}
+            onSelect={setCategoryFilter}
+          />
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={expenses.length === 0 ? 'Немає витрат' : 'Нічого не знайдено'}
+          message={expenses.length === 0 ? 'Додайте першу витрату' : 'Спробуйте інший пошук'}
+        />
       ) : (
-        <ExpensesList items={expenses} onDelete={setDeleting} />
+        <ExpensesList items={filtered} onDelete={setDeleting} />
       )}
 
       <FAB onClick={() => setShowForm(true)} />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { InventoryList } from './InventoryList'
@@ -7,6 +7,7 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { SearchBar } from '@/components/shared/SearchBar'
 import type { InventoryItem } from '@/types'
 
 export function InventoryPage() {
@@ -15,6 +16,13 @@ export function InventoryPage() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<InventoryItem | null>(null)
   const [deleting, setDeleting] = useState<InventoryItem | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!search) return inventory
+    const q = search.toLowerCase()
+    return inventory.filter((i) => i.name.toLowerCase().includes(q))
+  }, [inventory, search])
 
   const handleAdd = async (data: Omit<InventoryItem, 'id' | 'docId'>) => {
     await addItem('inventory', data)
@@ -42,11 +50,18 @@ export function InventoryPage() {
         <p className="text-sm text-gray-500 mt-0.5">Сировина та матеріали</p>
       </div>
 
-      {inventory.length === 0 ? (
-        <EmptyState title="Склад порожній" message="Додайте матеріали" />
+      {inventory.length > 0 && (
+        <SearchBar value={search} onChange={setSearch} placeholder="Пошук матеріалу..." />
+      )}
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={inventory.length === 0 ? 'Склад порожній' : 'Нічого не знайдено'}
+          message={inventory.length === 0 ? 'Додайте матеріали' : 'Спробуйте інший пошук'}
+        />
       ) : (
         <InventoryList
-          items={inventory}
+          items={filtered}
           canEdit={canEdit()}
           showPrices={canViewFinances()}
           onEdit={setEditing}

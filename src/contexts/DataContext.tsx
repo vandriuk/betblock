@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { toast } from 'sonner'
 import { subscribeCollection, addDocument, updateDocument, deleteDocument } from '@/services/firestore'
 import { DEFAULT_INVENTORY, DEFAULT_PRODUCTS } from '@/lib/constants'
 import { useAuth } from './AuthContext'
@@ -81,10 +82,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return () => unsubs.forEach((unsub) => unsub())
   }, [user])
 
-  const addItem = (col: string, data: DocumentData) => addDocument(col, data)
-  const updateItem = (col: string, docId: string, data: Partial<DocumentData>) =>
-    updateDocument(col, docId, data)
-  const deleteItem = (col: string, docId: string) => deleteDocument(col, docId)
+  const addItem = useCallback(async (col: string, data: DocumentData) => {
+    try {
+      const id = await addDocument(col, data)
+      toast.success('Додано')
+      return id
+    } catch (e) {
+      toast.error('Помилка при додаванні')
+      throw e
+    }
+  }, [])
+
+  const updateItem = useCallback(async (col: string, docId: string, data: Partial<DocumentData>) => {
+    try {
+      await updateDocument(col, docId, data)
+      toast.success('Оновлено')
+    } catch (e) {
+      toast.error('Помилка при оновленні')
+      throw e
+    }
+  }, [])
+
+  const deleteItem = useCallback(async (col: string, docId: string) => {
+    try {
+      await deleteDocument(col, docId)
+      toast.success('Видалено')
+    } catch (e) {
+      toast.error('Помилка при видаленні')
+      throw e
+    }
+  }, [])
 
   return (
     <DataContext.Provider

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { SalesList } from './SalesList'
@@ -7,6 +7,7 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { SearchBar } from '@/components/shared/SearchBar'
 import type { Sale } from '@/types'
 
 export function SalesPage() {
@@ -14,6 +15,15 @@ export function SalesPage() {
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Sale | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!search) return sales
+    const q = search.toLowerCase()
+    return sales.filter((s) =>
+      s.customer.toLowerCase().includes(q) || s.productName.toLowerCase().includes(q)
+    )
+  }, [sales, search])
 
   const handleAdd = async (data: Omit<Sale, 'id' | 'docId'>) => {
     await addItem('sales', data)
@@ -39,11 +49,18 @@ export function SalesPage() {
         <p className="text-sm text-gray-500 mt-0.5">Облік продажів</p>
       </div>
 
-      {sales.length === 0 ? (
-        <EmptyState title="Немає продажів" message="Додайте перший продаж" />
+      {sales.length > 0 && (
+        <SearchBar value={search} onChange={setSearch} placeholder="Пошук за клієнтом..." />
+      )}
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={sales.length === 0 ? 'Немає продажів' : 'Нічого не знайдено'}
+          message={sales.length === 0 ? 'Додайте перший продаж' : 'Спробуйте інший пошук'}
+        />
       ) : (
         <SalesList
-          items={sales}
+          items={filtered}
           onTogglePaid={handleTogglePaid}
           onDelete={setDeleting}
         />

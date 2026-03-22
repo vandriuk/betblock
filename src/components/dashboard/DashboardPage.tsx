@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { StatsCards } from './StatsCards'
 import { InventoryAlerts } from './InventoryAlerts'
 import { FinanceSummary } from './FinanceSummary'
+import { ProductionChart } from './ProductionChart'
 import { calculateProductStats, calculateFinancialStats } from '@/lib/stats'
 
 export function DashboardPage() {
@@ -23,6 +24,8 @@ export function DashboardPage() {
       <StatsCards stats={productStats} />
 
       {lowStock.length > 0 && <InventoryAlerts items={lowStock} />}
+
+      <ProductionChart production={production} />
 
       {canViewFinances() && <FinanceSummary stats={financialStats} />}
     </div>

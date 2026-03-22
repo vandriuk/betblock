@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { DataProvider } from '@/contexts/DataContext'
 import { LoginScreen } from '@/components/auth/LoginScreen'
@@ -51,6 +52,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppContent />
+      <Toaster position="top-center" richColors closeButton />
     </AuthProvider>
   )
 }

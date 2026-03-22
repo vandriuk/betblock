@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { OrderList } from './OrderList'
@@ -7,6 +7,9 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { SearchBar } from '@/components/shared/SearchBar'
+import { StatusFilter } from '@/components/shared/StatusFilter'
+import { ORDER_STATUSES } from '@/lib/constants'
 import type { Order, OrderStatus } from '@/types'
 
 export function OrdersPage() {
@@ -14,6 +17,20 @@ export function OrdersPage() {
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Order | null>(null)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null)
+
+  const filtered = useMemo(() => {
+    let result = orders
+    if (statusFilter) result = result.filter((o) => o.status === statusFilter)
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter((o) =>
+        o.customer.toLowerCase().includes(q) || o.productName.toLowerCase().includes(q)
+      )
+    }
+    return result
+  }, [orders, statusFilter, search])
 
   const handleAdd = async (data: Omit<Order, 'id' | 'docId'>) => {
     await addItem('orders', data)
@@ -39,11 +56,25 @@ export function OrdersPage() {
         <p className="text-sm text-gray-500 mt-0.5">Замовлення клієнтів</p>
       </div>
 
-      {orders.length === 0 ? (
-        <EmptyState title="Немає замовлень" message="Створіть перше замовлення" />
+      {orders.length > 0 && (
+        <div className="space-y-3">
+          <SearchBar value={search} onChange={setSearch} placeholder="Пошук за клієнтом..." />
+          <StatusFilter
+            options={ORDER_STATUSES}
+            selected={statusFilter}
+            onSelect={setStatusFilter}
+          />
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={orders.length === 0 ? 'Немає замовлень' : 'Нічого не знайдено'}
+          message={orders.length === 0 ? 'Створіть перше замовлення' : 'Спробуйте інший пошук'}
+        />
       ) : (
         <OrderList
-          items={orders}
+          items={filtered}
           canEdit={canEdit()}
           onStatusChange={handleStatusChange}
           onDelete={setDeleting}

@@ -1,7 +1,8 @@
-import { LogOut, Download, Database } from 'lucide-react'
+import { LogOut, Download, Database, Sun, Moon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useData } from '@/contexts/DataContext'
 import { useExport } from '@/hooks/useExport'
+import { useDarkMode } from '@/hooks/useDarkMode'
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Адмін',
@@ -13,16 +14,9 @@ export function Header() {
   const { user, logout, canViewFinances, canEdit } = useAuth()
   const data = useData()
   const { exportToExcel, exportToJSON } = useExport()
+  const { dark, toggle: toggleDark } = useDarkMode()
 
   if (!user) return null
-
-  const handleExcelExport = () => {
-    exportToExcel(data, canViewFinances())
-  }
-
-  const handleJSONBackup = () => {
-    exportToJSON(data)
-  }
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
@@ -32,17 +26,24 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-1">
+          <button
+            onClick={toggleDark}
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 transition-colors"
+            title={dark ? 'Світла тема' : 'Темна тема'}
+          >
+            {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
           {canEdit() && (
             <>
               <button
-                onClick={handleExcelExport}
+                onClick={() => exportToExcel(data, canViewFinances())}
                 className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors"
                 title="Експорт Excel"
               >
                 <Download className="w-5 h-5" />
               </button>
               <button
-                onClick={handleJSONBackup}
+                onClick={() => exportToJSON(data)}
                 className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors"
                 title="Backup JSON"
               >

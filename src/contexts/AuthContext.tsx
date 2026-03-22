@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { toast } from 'sonner'
 import { signIn, signOut, onAuthStateChanged } from '@/services/auth'
 import type { AppUser } from '@/types'
 
@@ -26,13 +27,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    const u = await signIn(email, password)
-    setUser(u)
+    try {
+      const u = await signIn(email, password)
+      setUser(u)
+      toast.success(`Вітаємо, ${u.email}!`)
+    } catch {
+      toast.error('Невірний email або пароль')
+      throw new Error('auth_failed')
+    }
   }
 
   const logout = async () => {
     await signOut()
     setUser(null)
+    toast.info('Ви вийшли з системи')
   }
 
   const canEdit = () => {

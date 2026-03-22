@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { ProductionList } from './ProductionList'
@@ -7,6 +7,7 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { SearchBar } from '@/components/shared/SearchBar'
 import type { ProductionRecord } from '@/types'
 
 export function ProductionPage() {
@@ -14,6 +15,15 @@ export function ProductionPage() {
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<ProductionRecord | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!search) return production
+    const q = search.toLowerCase()
+    return production.filter((p) =>
+      p.productName.toLowerCase().includes(q) || p.createdBy.toLowerCase().includes(q)
+    )
+  }, [production, search])
 
   const handleAdd = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
     await addItem('production', data)
@@ -34,11 +44,18 @@ export function ProductionPage() {
         <p className="text-sm text-gray-500 mt-0.5">Журнал виробництва блоків</p>
       </div>
 
-      {production.length === 0 ? (
-        <EmptyState title="Немає записів" message="Додайте запис виробництва" />
+      {production.length > 0 && (
+        <SearchBar value={search} onChange={setSearch} placeholder="Пошук за продуктом або працівником..." />
+      )}
+
+      {filtered.length === 0 ? (
+        <EmptyState
+          title={production.length === 0 ? 'Немає записів' : 'Нічого не знайдено'}
+          message={production.length === 0 ? 'Додайте запис виробництва' : 'Спробуйте інший пошук'}
+        />
       ) : (
         <ProductionList
-          items={production}
+          items={filtered}
           canDelete={canEdit()}
           onDelete={setDeleting}
         />

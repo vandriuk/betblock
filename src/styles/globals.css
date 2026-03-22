@@ -45,17 +45,16 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Mobile-friendly touch targets */
   button, a, input, select, textarea {
     min-height: 44px;
   }
 
   input, select, textarea {
-    font-size: 16px; /* Prevents iOS zoom on focus */
+    font-size: 16px;
   }
 }
 
-/* Dark mode */
+/* Dark mode overrides */
 .dark {
   --color-background: #0f172a;
   --color-foreground: #f8fafc;
@@ -67,7 +66,72 @@
   --color-muted-foreground: #94a3b8;
 }
 
-/* Safe area for mobile devices with notch */
+.dark body {
+  color-scheme: dark;
+}
+
+.dark .bg-white {
+  background-color: #1e293b;
+}
+
+.dark .bg-gray-50 {
+  background-color: #1e293b;
+}
+
+.dark .bg-gray-100 {
+  background-color: #334155;
+}
+
+.dark .border-gray-200 {
+  border-color: #334155;
+}
+
+.dark .border-gray-100 {
+  border-color: #1e293b;
+}
+
+.dark .text-gray-900 {
+  color: #f1f5f9;
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1;
+}
+
+.dark .text-gray-600 {
+  color: #94a3b8;
+}
+
+.dark .text-gray-500 {
+  color: #94a3b8;
+}
+
+.dark .text-gray-400 {
+  color: #64748b;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #334155;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #334155;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #475569;
+}
+
+/* Safe area */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
