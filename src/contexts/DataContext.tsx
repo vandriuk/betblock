@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { subscribeCollection, addDocument, updateDocument, deleteDocument } from '@/services/firestore'
+import { logEvent } from '@/services/firebase'
 import { DEFAULT_INVENTORY, DEFAULT_PRODUCTS } from '@/lib/constants'
 import { useAuth } from './AuthContext'
 import type {
@@ -85,6 +86,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback(async (col: string, data: DocumentData) => {
     try {
       const id = await addDocument(col, data)
+      logEvent('create_record', { collection: col })
       toast.success('Додано')
       return id
     } catch (e) {
@@ -106,6 +108,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deleteItem = useCallback(async (col: string, docId: string) => {
     try {
       await deleteDocument(col, docId)
+      logEvent('delete_record', { collection: col })
       toast.success('Видалено')
     } catch (e) {
       toast.error('Помилка при видаленні')

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { DataProvider } from '@/contexts/DataContext'
+import { logEvent } from '@/services/firebase'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { AppShell } from '@/components/layout/AppShell'
 import { DashboardPage } from '@/components/dashboard/DashboardPage'
@@ -16,6 +18,11 @@ import type { TabId } from '@/components/layout/BottomNav'
 function AppContent() {
   const { user, loading } = useAuth()
   const [activeTab, setActiveTab] = useState<TabId>('dashboard')
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab)
+    logEvent('page_view', { page: tab })
+  }
 
   if (loading) {
     return (
@@ -41,7 +48,7 @@ function AppContent() {
 
   return (
     <DataProvider>
-      <AppShell activeTab={activeTab} onTabChange={setActiveTab}>
+      <AppShell activeTab={activeTab} onTabChange={handleTabChange}>
         {pages[activeTab]}
       </AppShell>
     </DataProvider>
@@ -50,9 +57,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-      <Toaster position="top-center" richColors closeButton />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+        <Toaster position="top-center" richColors closeButton />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }

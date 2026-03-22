@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useData } from '@/contexts/DataContext'
 import { useExport } from '@/hooks/useExport'
 import { useDarkMode } from '@/hooks/useDarkMode'
+import { FeedbackButton } from '@/components/shared/FeedbackButton'
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Адмін',
@@ -33,6 +34,7 @@ export function Header() {
           >
             {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
+          <FeedbackButton userEmail={user.email} />
           {canEdit() && (
             <>
               <button

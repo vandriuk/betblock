@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { signIn, signOut, onAuthStateChanged } from '@/services/auth'
+import { logEvent } from '@/services/firebase'
 import type { AppUser } from '@/types'
 
 interface AuthContextValue {
@@ -30,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const u = await signIn(email, password)
       setUser(u)
+      logEvent('login', { method: 'email', role: u.role })
       toast.success(`Вітаємо, ${u.email}!`)
     } catch {
       toast.error('Невірний email або пароль')

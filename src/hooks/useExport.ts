@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx'
+import { logEvent } from '@/services/firebase'
 import type { InventoryItem, Product, ProductionRecord, Order, Sale, Expense } from '@/types'
 
 interface ExportData {
@@ -79,6 +80,7 @@ export function useExport() {
 
     const date = new Date().toISOString().split('T')[0]
     XLSX.writeFile(wb, `backup_${date}.xlsx`)
+    logEvent('export', { format: 'excel' })
   }
 
   const exportToJSON = (data: ExportData) => {
@@ -93,6 +95,7 @@ export function useExport() {
     a.download = `backup_${new Date().toISOString().split('T')[0]}.json`
     a.click()
     URL.revokeObjectURL(url)
+    logEvent('export', { format: 'json' })
   }
 
   return { exportToExcel, exportToJSON }
