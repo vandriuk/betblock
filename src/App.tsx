@@ -4,15 +4,13 @@ import { DataProvider } from '@/contexts/DataContext'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { AppShell } from '@/components/layout/AppShell'
 import { DashboardPage } from '@/components/dashboard/DashboardPage'
+import { InventoryPage } from '@/components/inventory/InventoryPage'
+import { ProductsPage } from '@/components/products/ProductsPage'
+import { ProductionPage } from '@/components/production/ProductionPage'
+import { OrdersPage } from '@/components/orders/OrdersPage'
+import { SalesPage } from '@/components/sales/SalesPage'
+import { ExpensesPage } from '@/components/expenses/ExpensesPage'
 import type { TabId } from '@/components/layout/BottomNav'
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="flex items-center justify-center h-64 bg-white rounded-2xl border border-gray-200">
-      <p className="text-gray-400 text-lg">{title} — скоро буде</p>
-    </div>
-  )
-}
 
 function AppContent() {
   const { user, loading } = useAuth()
@@ -32,12 +30,12 @@ function AppContent() {
 
   const pages: Record<TabId, React.ReactNode> = {
     dashboard: <DashboardPage />,
-    inventory: <PlaceholderPage title="Склад" />,
-    products: <PlaceholderPage title="Продукція" />,
-    production: <PlaceholderPage title="Виробництво" />,
-    orders: <PlaceholderPage title="Замовлення" />,
-    sales: <PlaceholderPage title="Продажі" />,
-    expenses: <PlaceholderPage title="Витрати" />,
+    inventory: <InventoryPage />,
+    products: <ProductsPage />,
+    production: <ProductionPage />,
+    orders: <OrdersPage />,
+    sales: <SalesPage />,
+    expenses: <ExpensesPage />,
   }
 
   return (

@@ -14,7 +14,6 @@ interface SidebarProps {
   activeTab: TabId
   onTabChange: (tab: TabId) => void
   showFinances: boolean
-  open: boolean
 }
 
 const NAV_ITEMS: { id: TabId; label: string; icon: typeof BarChart3; finance?: boolean }[] = [
@@ -27,16 +26,12 @@ const NAV_ITEMS: { id: TabId; label: string; icon: typeof BarChart3; finance?: b
   { id: 'expenses', label: 'Витрати', icon: DollarSign, finance: true },
 ]
 
-export function Sidebar({ activeTab, onTabChange, showFinances, open }: SidebarProps) {
+export function Sidebar({ activeTab, onTabChange, showFinances }: SidebarProps) {
   const items = NAV_ITEMS.filter((item) => !item.finance || showFinances)
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 z-30 transition-transform hidden md:block',
-        open ? 'translate-x-0' : 'translate-x-0'
-      )}
-    >
+    <aside className="fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 z-30 hidden md:block">
+
       <nav className="p-3 space-y-1">
         {items.map((item) => {
           const Icon = item.icon

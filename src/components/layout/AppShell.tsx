@@ -13,7 +13,6 @@ interface AppShellProps {
 export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   const { canViewFinances } = useAuth()
   const [moreOpen, setMoreOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleMoreClick = () => {
     setMoreOpen(true)
@@ -26,14 +25,13 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      <Header />
 
       {/* Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={onTabChange}
         showFinances={canViewFinances()}
-        open={sidebarOpen}
       />
 
       {/* Main content */}
