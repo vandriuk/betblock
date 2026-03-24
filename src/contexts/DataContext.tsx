@@ -238,34 +238,50 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const addExpenseWithInventory = useCallback(async (
     data: Omit<Expense, 'id' | 'docId'>
   ) => {
-    // Save the expense
-    await addDocument('expenses', data)
-    logEvent('create_record', { collection: 'expenses' })
-
-    // If category is "Сировина" and has material info, add to inventory
+    // If category is "Сировина" and has material info, update inventory FIRST
     if (data.category === 'Сировина' && data.materialName && data.materialQuantity && data.materialQuantity > 0) {
       const material = inventory.find((inv) => inv.name === data.materialName)
       if (material) {
         const materialId = material.docId || String(material.id)
-        await updateDocument('inventory', materialId, {
-          quantity: material.quantity + data.materialQuantity,
-        })
+        try {
+          // 1. Update inventory quantity
+          await updateDocument('inventory', materialId, {
+            quantity: material.quantity + data.materialQuantity,
+          })
 
-        // Log movement
-        await addDocument('movements', {
-          date: data.date,
-          materialName: data.materialName,
-          type: 'income',
-          quantity: data.materialQuantity,
-          reason: `Закупівля: ${data.description}`,
-          createdBy: data.createdBy,
-        })
+          // 2. Save the expense
+          await addDocument('expenses', data)
+          logEvent('create_record', { collection: 'expenses' })
 
-        toast.success('Витрату додано, матеріал оприбутковано на склад')
+          // 3. Log movement (non-critical, wrapped in try-catch)
+          try {
+            await addDocument('movements', {
+              date: data.date,
+              materialName: data.materialName,
+              type: 'income',
+              quantity: data.materialQuantity,
+              reason: `Закупівля: ${data.description}`,
+              createdBy: data.createdBy,
+            })
+          } catch (movErr) {
+            console.warn('Movement log failed:', movErr)
+          }
+
+          toast.success(`Витрату додано, +${data.materialQuantity} ${material.unit} ${data.materialName} на склад`)
+        } catch (err) {
+          console.error('Expense with inventory failed:', err)
+          toast.error('Помилка при збереженні')
+        }
       } else {
+        // Material not found in inventory — just save expense
+        await addDocument('expenses', data)
+        logEvent('create_record', { collection: 'expenses' })
         toast.success('Витрату додано (матеріал не знайдено на складі)')
       }
     } else {
+      // Not a material expense — just save
+      await addDocument('expenses', data)
+      logEvent('create_record', { collection: 'expenses' })
       toast.success('Додано')
     }
   }, [inventory])

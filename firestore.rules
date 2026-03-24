@@ -19,6 +19,7 @@ service cloud.firestore {
     match /orders/{doc} { allow read: if isAuth(); allow write: if canEdit(); }
     match /sales/{doc} { allow read: if isAuth() && canEdit(); allow write: if canEdit(); }
     match /expenses/{doc} { allow read: if isAuth() && canEdit(); allow write: if canEdit(); }
+    match /movements/{doc} { allow read: if isAuth(); allow write: if canEdit(); }
     match /errors/{doc} { allow create: if isAuth(); }
     match /feedback/{doc} { allow create: if isAuth(); allow read: if isAdmin(); }
   }
