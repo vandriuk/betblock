@@ -32,9 +32,14 @@ export function ExpensesList({ items, onDelete }: ExpensesListProps) {
                 {expense.category}
               </span>
             </div>
-            <div className="flex items-center gap-3 mt-1 text-sm">
+            <div className="flex items-center gap-3 mt-1 text-sm flex-wrap">
               <span className="text-gray-500">{formatDate(expense.date)}</span>
               <span className="font-bold text-red-600">{formatCurrency(expense.amount)}</span>
+              {expense.materialName && expense.materialQuantity && expense.materialQuantity > 0 && (
+                <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                  +{expense.materialQuantity} {expense.materialName}
+                </span>
+              )}
             </div>
           </div>
           <button

@@ -13,7 +13,7 @@ import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import type { Expense, ExpenseCategory } from '@/types'
 
 export function ExpensesPage() {
-  const { expenses, addItem, deleteItem } = useData()
+  const { expenses, inventory, addExpenseWithInventory, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Expense | null>(null)
@@ -31,7 +31,7 @@ export function ExpensesPage() {
   }, [expenses, categoryFilter, search])
 
   const handleAdd = async (data: Omit<Expense, 'id' | 'docId'>) => {
-    await addItem('expenses', data)
+    await addExpenseWithInventory(data)
     setShowForm(false)
   }
 
@@ -72,7 +72,13 @@ export function ExpensesPage() {
       <FAB onClick={() => setShowForm(true)} />
 
       <Sheet open={showForm} onClose={() => setShowForm(false)} title="Нова витрата">
-        {user && <ExpenseForm userEmail={user.email} onSubmit={handleAdd} />}
+        {user && (
+          <ExpenseForm
+            userEmail={user.email}
+            inventory={inventory}
+            onSubmit={handleAdd}
+          />
+        )}
       </Sheet>
 
       <ConfirmDialog

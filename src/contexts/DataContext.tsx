@@ -29,6 +29,7 @@ interface DataContextValue {
   deleteItem: (collection: string, docId: string) => Promise<void>
   // Enhanced methods
   addProductionWithDeduction: (data: Omit<ProductionRecord, 'id' | 'docId'>) => Promise<{ success: boolean; error?: string }>
+  addExpenseWithInventory: (data: Omit<Expense, 'id' | 'docId'>) => Promise<void>
   createSaleFromOrder: (order: Order, userEmail: string) => Promise<void>
   undoDelete: () => Promise<void>
   lastDeleted: { collection: string; data: DocumentData } | null
@@ -233,6 +234,42 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return { success: true }
   }, [products, inventory])
 
+  // Add expense with automatic inventory income for "Сировина"
+  const addExpenseWithInventory = useCallback(async (
+    data: Omit<Expense, 'id' | 'docId'>
+  ) => {
+    // Save the expense
+    await addDocument('expenses', data)
+    logEvent('create_record', { collection: 'expenses' })
+
+    // If category is "Сировина" and has material info, add to inventory
+    if (data.category === 'Сировина' && data.materialName && data.materialQuantity && data.materialQuantity > 0) {
+      const material = inventory.find((inv) => inv.name === data.materialName)
+      if (material) {
+        const materialId = material.docId || String(material.id)
+        await updateDocument('inventory', materialId, {
+          quantity: material.quantity + data.materialQuantity,
+        })
+
+        // Log movement
+        await addDocument('movements', {
+          date: data.date,
+          materialName: data.materialName,
+          type: 'income',
+          quantity: data.materialQuantity,
+          reason: `Закупівля: ${data.description}`,
+          createdBy: data.createdBy,
+        })
+
+        toast.success('Витрату додано, матеріал оприбутковано на склад')
+      } else {
+        toast.success('Витрату додано (матеріал не знайдено на складі)')
+      }
+    } else {
+      toast.success('Додано')
+    }
+  }, [inventory])
+
   // Create sale from order
   const createSaleFromOrder = useCallback(async (order: Order, userEmail: string) => {
     const product = products.find((p) => p.name === order.productName)
@@ -278,6 +315,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         updateItem,
         deleteItem,
         addProductionWithDeduction,
+        addExpenseWithInventory,
         createSaleFromOrder,
         undoDelete,
         lastDeleted,

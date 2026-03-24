@@ -117,6 +117,9 @@ export interface Expense {
   description: string
   amount: number
   createdBy: string
+  // Only for category "Сировина" — auto-income to inventory
+  materialName?: string
+  materialQuantity?: number // in the material's unit (kg, t, etc.)
 }
 
 // === Stats ===
