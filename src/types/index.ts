@@ -23,11 +23,32 @@ export interface InventoryItem {
 
 // === Products ===
 
+export interface RecipeItem {
+  materialName: string // references InventoryItem.name
+  amountPerBlock: number // how much material per 1 block
+}
+
 export interface Product {
   id?: number
   docId?: string
   name: string
   price: number
+  recipe?: RecipeItem[] // recipe for auto-deduction
+}
+
+// === Inventory Movement Log ===
+
+export type MovementType = 'income' | 'expense' | 'production' | 'adjustment'
+
+export interface InventoryMovement {
+  id?: number
+  docId?: string
+  date: string
+  materialName: string
+  type: MovementType
+  quantity: number // positive = income, negative = expense
+  reason: string
+  createdBy: string
 }
 
 // === Production ===
@@ -58,6 +79,7 @@ export interface Order {
   status: OrderStatus
   notes: string
   createdBy: string
+  saleId?: string // linked sale (when converted to sale)
 }
 
 // === Sales ===
@@ -73,6 +95,7 @@ export interface Sale {
   price: number
   paid: boolean
   createdBy: string
+  orderId?: string // linked order (when created from order)
 }
 
 // === Expenses ===
@@ -110,4 +133,6 @@ export interface FinancialStats {
   totalRevenue: number
   totalExpenses: number
   profit: number
+  unpaidDebt: number // total unpaid sales amount
+  profitByProduct: { name: string; revenue: number }[]
 }

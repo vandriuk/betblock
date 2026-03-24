@@ -11,7 +11,7 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import type { Sale } from '@/types'
 
 export function SalesPage() {
-  const { sales, products, addItem, updateItem, deleteItem } = useData()
+  const { sales, products, production, addItem, updateItem, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Sale | null>(null)
@@ -70,7 +70,13 @@ export function SalesPage() {
 
       <Sheet open={showForm} onClose={() => setShowForm(false)} title="Новий продаж">
         {user && (
-          <SaleForm products={products} userEmail={user.email} onSubmit={handleAdd} />
+          <SaleForm
+            products={products}
+            production={production}
+            sales={sales}
+            userEmail={user.email}
+            onSubmit={handleAdd}
+          />
         )}
       </Sheet>
 

@@ -15,6 +15,7 @@ const ProductionPage = lazy(() => import('@/components/production/ProductionPage
 const OrdersPage = lazy(() => import('@/components/orders/OrdersPage').then(m => ({ default: m.OrdersPage })))
 const SalesPage = lazy(() => import('@/components/sales/SalesPage').then(m => ({ default: m.SalesPage })))
 const ExpensesPage = lazy(() => import('@/components/expenses/ExpensesPage').then(m => ({ default: m.ExpensesPage })))
+const MovementsPage = lazy(() => import('@/components/movements/MovementsPage').then(m => ({ default: m.MovementsPage })))
 
 function PageLoader() {
   return (
@@ -51,6 +52,7 @@ function AppContent() {
     products: <ProductsPage />,
     production: <ProductionPage />,
     orders: <OrdersPage />,
+    movements: <MovementsPage />,
     sales: <SalesPage />,
     expenses: <ExpensesPage />,
   }

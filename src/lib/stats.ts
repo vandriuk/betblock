@@ -39,9 +39,26 @@ export function calculateFinancialStats(
 
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
 
+  // Unpaid debt — total amount from unpaid sales
+  const unpaidDebt = sales
+    .filter((s) => !s.paid)
+    .reduce((sum, s) => sum + s.blocks * s.price, 0)
+
+  // Revenue breakdown by product
+  const revenueMap = new Map<string, number>()
+  for (const s of sales.filter((s) => s.paid)) {
+    const current = revenueMap.get(s.productName) || 0
+    revenueMap.set(s.productName, current + s.blocks * s.price)
+  }
+  const profitByProduct = Array.from(revenueMap.entries())
+    .map(([name, revenue]) => ({ name, revenue }))
+    .sort((a, b) => b.revenue - a.revenue)
+
   return {
     totalRevenue,
     totalExpenses,
     profit: totalRevenue - totalExpenses,
+    unpaidDebt,
+    profitByProduct,
   }
 }

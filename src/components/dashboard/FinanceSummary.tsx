@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, AlertCircle } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { FinancialStats } from '@/types'
 
@@ -10,7 +10,7 @@ export function FinanceSummary({ stats }: FinanceSummaryProps) {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Фінанси</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FinanceCard
           icon={TrendingUp}
           label="Дохід"
@@ -35,7 +35,44 @@ export function FinanceSummary({ stats }: FinanceSummaryProps) {
           bg={stats.profit >= 0 ? 'bg-green-50' : 'bg-red-50'}
           border={stats.profit >= 0 ? 'border-green-200' : 'border-red-200'}
         />
+        {stats.unpaidDebt > 0 && (
+          <FinanceCard
+            icon={AlertCircle}
+            label="Борги клієнтів"
+            value={stats.unpaidDebt}
+            color="text-orange-600"
+            bg="bg-orange-50"
+            border="border-orange-200"
+          />
+        )}
       </div>
+
+      {/* Revenue by product */}
+      {stats.profitByProduct.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">Дохід по продукції</h4>
+          <div className="space-y-2">
+            {stats.profitByProduct.map((item) => {
+              const maxRevenue = stats.profitByProduct[0]?.revenue || 1
+              const percent = Math.round((item.revenue / maxRevenue) * 100)
+              return (
+                <div key={item.name}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="font-medium text-gray-700">{item.name}</span>
+                    <span className="font-bold text-gray-900">{formatCurrency(item.revenue)}</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className="bg-primary-500 rounded-full h-2 transition-all"
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

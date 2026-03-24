@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   DollarSign,
   Boxes,
+  ArrowLeftRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { TabId } from './BottomNav'
@@ -22,6 +23,7 @@ const NAV_ITEMS: { id: TabId; label: string; icon: typeof BarChart3; finance?: b
   { id: 'products', label: 'Продукція', icon: Boxes },
   { id: 'production', label: 'Виробництво', icon: Factory },
   { id: 'orders', label: 'Замовлення', icon: ClipboardList },
+  { id: 'movements', label: 'Рух складу', icon: ArrowLeftRight },
   { id: 'sales', label: 'Продажі', icon: ShoppingCart, finance: true },
   { id: 'expenses', label: 'Витрати', icon: DollarSign, finance: true },
 ]

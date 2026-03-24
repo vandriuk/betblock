@@ -7,24 +7,24 @@ import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
-import type { Product } from '@/types'
+import type { Product, RecipeItem } from '@/types'
 
 export function ProductsPage() {
-  const { products, addItem, updateItem, deleteItem } = useData()
+  const { products, inventory, addItem, updateItem, deleteItem } = useData()
   const { canEdit } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
   const [deleting, setDeleting] = useState<Product | null>(null)
 
-  const handleAdd = async (name: string, price: number) => {
-    await addItem('products', { name, price })
+  const handleAdd = async (name: string, price: number, recipe: RecipeItem[]) => {
+    await addItem('products', { name, price, recipe })
     setShowForm(false)
   }
 
-  const handleEdit = async (name: string, price: number) => {
+  const handleEdit = async (name: string, price: number, recipe: RecipeItem[]) => {
     if (!editing) return
     const id = editing.docId || String(editing.id)
-    await updateItem('products', id, { name, price })
+    await updateItem('products', id, { name, price, recipe })
     setEditing(null)
   }
 
@@ -39,7 +39,7 @@ export function ProductsPage() {
     <div className="space-y-4">
       <div>
         <h2 className="text-xl font-bold text-gray-900">Продукція</h2>
-        <p className="text-sm text-gray-500 mt-0.5">Типи блоків та ціни</p>
+        <p className="text-sm text-gray-500 mt-0.5">Типи блоків, ціни та рецептура</p>
       </div>
 
       {products.length === 0 ? (
@@ -61,15 +61,16 @@ export function ProductsPage() {
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}
 
       <Sheet open={showForm} onClose={() => setShowForm(false)} title="Нова продукція">
-        <ProductForm onSubmit={handleAdd} />
+        <ProductForm onSubmit={handleAdd} inventory={inventory} />
       </Sheet>
 
       <Sheet open={!!editing} onClose={() => setEditing(null)} title="Редагування">
         {editing && (
           <ProductForm
             onSubmit={handleEdit}
-            initial={{ name: editing.name, price: editing.price }}
+            initial={{ name: editing.name, price: editing.price, recipe: editing.recipe }}
             submitLabel="Зберегти"
+            inventory={inventory}
           />
         )}
       </Sheet>

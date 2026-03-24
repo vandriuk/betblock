@@ -72,6 +72,11 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
                 active={activeTab === 'products'}
                 onClick={() => handleMoreSelect('products')}
               />
+              <MoreButton
+                label="Рух складу"
+                active={activeTab === 'movements'}
+                onClick={() => handleMoreSelect('movements')}
+              />
               {canViewFinances() && (
                 <>
                   <MoreButton

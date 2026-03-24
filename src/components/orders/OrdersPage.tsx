@@ -13,7 +13,7 @@ import { ORDER_STATUSES } from '@/lib/constants'
 import type { Order, OrderStatus } from '@/types'
 
 export function OrdersPage() {
-  const { orders, products, addItem, updateItem, deleteItem } = useData()
+  const { orders, products, addItem, updateItem, deleteItem, createSaleFromOrder } = useData()
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<Order | null>(null)
@@ -40,6 +40,11 @@ export function OrdersPage() {
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
     const id = order.docId || String(order.id)
     await updateItem('orders', id, { status: newStatus })
+  }
+
+  const handleCreateSale = async (order: Order) => {
+    if (!user) return
+    await createSaleFromOrder(order, user.email)
   }
 
   const handleDelete = async () => {
@@ -78,6 +83,7 @@ export function OrdersPage() {
           canEdit={canEdit()}
           onStatusChange={handleStatusChange}
           onDelete={setDeleting}
+          onCreateSale={handleCreateSale}
         />
       )}
 

@@ -1,4 +1,4 @@
-import type { ExpenseCategory, OrderStatus, Shift, InventoryItem, Product } from '@/types'
+import type { ExpenseCategory, OrderStatus, Shift, InventoryItem, Product, MovementType } from '@/types'
 
 export const SHIFTS: Shift[] = ['Денна', 'Нічна']
 
@@ -28,6 +28,38 @@ export const DEFAULT_INVENTORY: Omit<InventoryItem, 'docId'>[] = [
 ]
 
 export const DEFAULT_PRODUCTS: Omit<Product, 'docId'>[] = [
-  { id: 1, name: 'Шлакоблок', price: 25 },
-  { id: 2, name: 'Бетоноблок', price: 30 },
+  {
+    id: 1,
+    name: 'Шлакоблок',
+    price: 25,
+    recipe: [
+      { materialName: 'Цемент', amountPerBlock: 2.5 },
+      { materialName: 'Пісок', amountPerBlock: 5 },
+      { materialName: 'Щебінь', amountPerBlock: 5 },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Бетоноблок',
+    price: 30,
+    recipe: [
+      { materialName: 'Цемент', amountPerBlock: 3 },
+      { materialName: 'Пісок', amountPerBlock: 4 },
+      { materialName: 'Щебінь', amountPerBlock: 6 },
+    ],
+  },
 ]
+
+export const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
+  income: 'Прихід',
+  expense: 'Витрата',
+  production: 'Виробництво',
+  adjustment: 'Коригування',
+}
+
+export const MOVEMENT_TYPE_COLORS: Record<MovementType, string> = {
+  income: 'bg-green-100 text-green-700',
+  expense: 'bg-red-100 text-red-700',
+  production: 'bg-blue-100 text-blue-700',
+  adjustment: 'bg-yellow-100 text-yellow-700',
+}

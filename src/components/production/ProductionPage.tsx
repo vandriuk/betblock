@@ -11,7 +11,7 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import type { ProductionRecord } from '@/types'
 
 export function ProductionPage() {
-  const { production, products, addItem, deleteItem } = useData()
+  const { production, products, inventory, addProductionWithDeduction, deleteItem } = useData()
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<ProductionRecord | null>(null)
@@ -26,8 +26,11 @@ export function ProductionPage() {
   }, [production, search])
 
   const handleAdd = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
-    await addItem('production', data)
-    setShowForm(false)
+    const result = await addProductionWithDeduction(data)
+    if (result.success) {
+      setShowForm(false)
+    }
+    return result
   }
 
   const handleDelete = async () => {
@@ -68,6 +71,7 @@ export function ProductionPage() {
         {user && (
           <ProductionForm
             products={products}
+            inventory={inventory}
             userEmail={user.email}
             onSubmit={handleAdd}
           />
