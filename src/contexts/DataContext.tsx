@@ -64,12 +64,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
 
     const unsubs = [
-      subscribeCollection<InventoryItem>('inventory', (items) => {
-        setInventory(items.length > 0 ? items : (DEFAULT_INVENTORY as InventoryItem[]))
+      subscribeCollection<InventoryItem>('inventory', async (items) => {
+        if (items.length === 0) {
+          // Seed default inventory into Firestore so they get real docIds
+          for (const item of DEFAULT_INVENTORY) {
+            await addDocument('inventory', item)
+          }
+          // The onSnapshot will fire again with the new docs — skip setting state here
+        } else {
+          setInventory(items)
+        }
         checkDone()
       }),
-      subscribeCollection<Product>('products', (items) => {
-        setProducts(items.length > 0 ? items : (DEFAULT_PRODUCTS as Product[]))
+      subscribeCollection<Product>('products', async (items) => {
+        if (items.length === 0) {
+          for (const item of DEFAULT_PRODUCTS) {
+            await addDocument('products', item)
+          }
+        } else {
+          setProducts(items)
+        }
         checkDone()
       }),
       subscribeCollection<ProductionRecord>('production', (items) => {
