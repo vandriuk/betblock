@@ -31,38 +31,43 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[60]">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
-      {/* Sheet panel */}
+      {/* Sheet panel — full screen overlay, no BottomNav conflict */}
       <div
-        className="absolute bottom-0 left-0 right-0 z-10 bg-white rounded-t-3xl animate-slide-up
-          flex flex-col max-h-[85vh]
-          md:static md:max-w-lg md:mx-auto md:mt-[5vh] md:rounded-2xl md:max-h-[85vh] md:animate-none"
-        onClick={(e) => e.stopPropagation()}
+        className="absolute inset-x-0 bottom-0 top-0 z-10 flex flex-col justify-end
+          md:static md:flex md:items-center md:justify-center"
+        onClick={onClose}
       >
-        {/* Drag handle + Header — non-scrollable */}
-        <div className="shrink-0 px-5 pt-3 pb-4 border-b border-gray-100 rounded-t-3xl">
-          <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4 md:hidden" />
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-            <button
-              onClick={onClose}
-              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:scale-95 transition-all text-xl"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-        {/* Content — scroll container with safe bottom padding */}
         <div
-          className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          className="bg-white rounded-t-3xl animate-slide-up flex flex-col max-h-[90vh]
+            md:rounded-2xl md:max-w-lg md:w-full md:max-h-[85vh] md:mx-4 md:animate-none"
+          onClick={(e) => e.stopPropagation()}
         >
-          {children}
+          {/* Drag handle + Header */}
+          <div className="shrink-0 px-5 pt-3 pb-3 border-b border-gray-100 rounded-t-3xl">
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3 md:hidden" />
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+              <button
+                onClick={onClose}
+                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:scale-95 transition-all text-xl"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+          {/* Scrollable content */}
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>
