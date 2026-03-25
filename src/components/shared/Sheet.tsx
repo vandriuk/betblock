@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, type ReactNode, type TouchEvent as ReactTouchEvent } from 'react'
+import { useEffect, useRef, useCallback, type ReactNode } from 'react'
 
 interface SheetProps {
   open: boolean
