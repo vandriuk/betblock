@@ -164,10 +164,3 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Sheet scroll area */
-.sheet-scroll-area {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: 70vh;
-  padding-bottom: 2rem;
-}
