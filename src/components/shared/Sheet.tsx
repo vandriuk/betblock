@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 interface SheetProps {
   open: boolean
@@ -8,23 +8,63 @@ interface SheetProps {
 }
 
 export function Sheet({ open, onClose, title, children }: SheetProps) {
-  // Prevent body scroll when sheet is open
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Lock body scroll when open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = '' }
+    if (!open) return
+    const scrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.overflow = ''
+      window.scrollTo(0, scrollY)
     }
+  }, [open])
+
+  // iOS: ensure scrollable area always has scroll room
+  // This prevents iOS from "locking" scroll on the body
+  useEffect(() => {
+    if (!open || !scrollRef.current) return
+    const el = scrollRef.current
+    const handleTouchStart = (e: TouchEvent) => {
+      // If at top, nudge down 1px so iOS doesn't try to scroll body
+      if (el.scrollTop <= 0) {
+        el.scrollTop = 1
+      }
+      // If at bottom, nudge up 1px
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight) {
+        el.scrollTop = el.scrollHeight - el.clientHeight - 1
+      }
+    }
+    el.addEventListener('touchstart', handleTouchStart, { passive: true })
+    return () => el.removeEventListener('touchstart', handleTouchStart)
   }, [open])
 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center">
+      {/* Backdrop */}
       <div
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl flex flex-col animate-slide-up md:absolute md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-lg md:w-full md:animate-none"
-        style={{ maxHeight: 'calc(100dvh - 2rem)' }}
+        className="absolute inset-0 bg-black/40 animate-fade-in"
+        onClick={onClose}
+        style={{ touchAction: 'none' }}
+      />
+      {/* Sheet container */}
+      <div
+        className="relative bg-white rounded-t-2xl flex flex-col animate-slide-up md:rounded-2xl md:max-w-lg md:w-full md:animate-none"
+        style={{ maxHeight: 'calc(var(--app-height, 100dvh) - 2rem)' }}
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* Header — fixed, not scrollable */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2 md:hidden" />
           <h3 className="text-lg font-semibold text-gray-900 mt-2 md:mt-0">{title}</h3>
@@ -35,9 +75,11 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
             &times;
           </button>
         </div>
+        {/* Scrollable content — min-h-0 is critical for flex overflow to work */}
         <div
-          className="overflow-y-auto overscroll-contain px-5 py-4 pb-8 flex-1"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          ref={scrollRef}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 pb-10"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
         >
           {children}
         </div>

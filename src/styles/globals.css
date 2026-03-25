@@ -163,3 +163,15 @@
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* iOS viewport height fix — sets --app-height to actual visible height */
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+@supports not (height: 100dvh) {
+  :root {
+    --app-height: 100vh;
+  }
+}
