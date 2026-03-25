@@ -164,13 +164,10 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Sheet scroll area — explicit max-height for iOS Safari compatibility */
+/* Sheet scroll area */
 .sheet-scroll-area {
-  max-height: calc(80vh - 60px);
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-@supports (height: 1dvh) {
-  .sheet-scroll-area {
-    max-height: calc(80dvh - 60px);
-  }
+  max-height: 70vh;
+  padding-bottom: 2rem;
 }
