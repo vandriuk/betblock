@@ -78,8 +78,8 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
         {/* Scrollable content — min-h-0 is critical for flex overflow to work */}
         <div
           ref={scrollRef}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4 pb-10"
-          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 py-4"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom, 0px))' }}
         >
           {children}
         </div>
