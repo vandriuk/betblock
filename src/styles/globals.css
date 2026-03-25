@@ -164,14 +164,12 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* iOS viewport height fix — sets --app-height to actual visible height */
-@supports (height: 100dvh) {
-  :root {
-    --app-height: 100dvh;
-  }
+/* Sheet scroll area — explicit max-height for iOS Safari compatibility */
+.sheet-scroll-area {
+  max-height: calc(80vh - 60px);
 }
-@supports not (height: 100dvh) {
-  :root {
-    --app-height: 100vh;
+@supports (height: 1dvh) {
+  .sheet-scroll-area {
+    max-height: calc(80dvh - 60px);
   }
 }
