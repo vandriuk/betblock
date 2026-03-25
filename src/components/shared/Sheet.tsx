@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, useCallback, type ReactNode, type TouchEvent as ReactTouchEvent } from 'react'
 
 interface SheetProps {
   open: boolean
@@ -8,39 +8,35 @@ interface SheetProps {
 }
 
 export function Sheet({ open, onClose, title, children }: SheetProps) {
-  // Lock body scroll when open (iOS-safe method)
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Block touch scroll on the overlay/backdrop only
+  // Allow scroll inside scrollRef
+  const handleOverlayTouch = useCallback((e: globalThis.TouchEvent) => {
+    // If touch is inside the scroll area, allow it
+    if (scrollRef.current?.contains(e.target as Node)) return
+    // Otherwise prevent — this stops body from scrolling
+    e.preventDefault()
+  }, [])
+
   useEffect(() => {
     if (!open) return
-    const scrollY = window.scrollY
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${scrollY}px`
-    document.body.style.left = '0'
-    document.body.style.right = '0'
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.left = ''
-      document.body.style.right = ''
-      document.body.style.overflow = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [open])
+    const el = overlayRef.current
+    if (!el) return
+    // passive: false is required to be able to preventDefault on touch
+    el.addEventListener('touchmove', handleOverlayTouch, { passive: false })
+    return () => el.removeEventListener('touchmove', handleOverlayTouch)
+  }, [open, handleOverlayTouch])
 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div ref={overlayRef} className="fixed inset-0 z-50">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 animate-fade-in"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
       {/* Sheet — mobile: bottom sheet, desktop: centered modal */}
-      <div
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl animate-slide-up md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-lg md:w-full md:animate-none"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl animate-slide-up md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:max-w-lg md:w-full md:max-h-[80vh] md:animate-none">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-2 md:hidden" />
@@ -52,17 +48,11 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
             &times;
           </button>
         </div>
-        {/* Scrollable content
-            - overflow-y: scroll (not auto) — iOS Safari needs explicit scroll
-            - explicit max-height instead of flex — Safari doesn't support flex overflow
-            - -webkit-overflow-scrolling: touch — smooth momentum scroll on iOS
-        */}
+        {/* Scrollable content */}
         <div
-          className="sheet-scroll-area overflow-y-scroll px-5 py-4"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-            paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom, 0px))',
-          }}
+          ref={scrollRef}
+          className="sheet-scroll-area overflow-y-scroll px-5 py-4 pb-safe"
+          style={{ paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom, 0px))' }}
         >
           {children}
         </div>

@@ -167,6 +167,7 @@
 /* Sheet scroll area — explicit max-height for iOS Safari compatibility */
 .sheet-scroll-area {
   max-height: calc(80vh - 60px);
+  -webkit-overflow-scrolling: touch;
 }
 @supports (height: 1dvh) {
   .sheet-scroll-area {
