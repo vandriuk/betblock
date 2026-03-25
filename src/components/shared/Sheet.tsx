@@ -34,7 +34,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
   useEffect(() => {
     if (!open || !scrollRef.current) return
     const el = scrollRef.current
-    const handleTouchStart = (e: TouchEvent) => {
+    const handleTouchStart = () => {
       // If at top, nudge down 1px so iOS doesn't try to scroll body
       if (el.scrollTop <= 0) {
         el.scrollTop = 1
