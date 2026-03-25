@@ -18,12 +18,12 @@ export function InventoryList({ items, canEdit, showPrices, onEdit, onDelete }: 
         return (
           <div
             key={item.docId || item.id}
-            className={`bg-white border rounded-xl p-4 ${isLow ? 'border-red-200 bg-red-50/50' : 'border-gray-200'}`}
+            className={`bg-white border rounded-2xl p-4 transition-all ${isLow ? 'border-red-200 bg-red-50/30' : 'border-gray-200'}`}
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                  <h4 className="font-bold text-gray-900">{item.name}</h4>
                   {isLow && <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
@@ -44,18 +44,18 @@ export function InventoryList({ items, canEdit, showPrices, onEdit, onDelete }: 
                 )}
               </div>
               {canEdit && (
-                <div className="flex gap-1 shrink-0 ml-2">
+                <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => onEdit(item)}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                    className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-primary-600 hover:bg-primary-50 active:scale-95 transition-all"
                   >
-                    <Pencil className="w-4 h-4" />
+                    <Pencil className="w-4.5 h-4.5" />
                   </button>
                   <button
                     onClick={() => onDelete(item)}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                    className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 active:scale-95 transition-all"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4.5 h-4.5" />
                   </button>
                 </div>
               )}

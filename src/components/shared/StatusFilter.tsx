@@ -9,12 +9,12 @@ interface StatusFilterProps<T extends string> {
 
 export function StatusFilter<T extends string>({ options, selected, onSelect, colors }: StatusFilterProps<T>) {
   return (
-    <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 hide-scrollbar">
       <button
         onClick={() => onSelect(null)}
         className={cn(
-          'px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0',
-          !selected ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95',
+          !selected ? 'bg-primary-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
         )}
       >
         Всі
@@ -24,9 +24,9 @@ export function StatusFilter<T extends string>({ options, selected, onSelect, co
           key={opt}
           onClick={() => onSelect(selected === opt ? null : opt)}
           className={cn(
-            'px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0',
+            'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95',
             selected === opt
-              ? (colors?.[opt] || 'bg-primary-600 text-white')
+              ? (colors?.[opt] || 'bg-primary-600 text-white shadow-sm')
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           )}
         >

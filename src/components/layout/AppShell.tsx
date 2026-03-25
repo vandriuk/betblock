@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { Boxes, ArrowLeftRight, ShoppingCart, DollarSign } from 'lucide-react'
 import { Header } from './Header'
 import { BottomNav, type TabId } from './BottomNav'
 import { Sidebar } from './Sidebar'
@@ -12,12 +13,18 @@ interface AppShellProps {
   children: React.ReactNode
 }
 
+const MORE_ITEMS = [
+  { id: 'products' as const, label: 'Продукція', icon: Boxes },
+  { id: 'movements' as const, label: 'Рух складу', icon: ArrowLeftRight },
+  { id: 'sales' as const, label: 'Продажі', icon: ShoppingCart, finance: true },
+  { id: 'expenses' as const, label: 'Витрати', icon: DollarSign, finance: true },
+]
+
 export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   const { canViewFinances } = useAuth()
   const [moreOpen, setMoreOpen] = useState(false)
 
   const handleRefresh = useCallback(async () => {
-    // Trigger a page reload to re-fetch Firestore data
     await new Promise((resolve) => setTimeout(resolve, 800))
     window.location.reload()
   }, [])
@@ -33,8 +40,10 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
     setMoreOpen(false)
   }
 
+  const visibleItems = MORE_ITEMS.filter((item) => !item.finance || canViewFinances())
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-grid-pattern">
       <Header />
 
       {/* Desktop Sidebar */}
@@ -63,51 +72,39 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
       {/* More Sheet (mobile) */}
       {moreOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMoreOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl pb-safe animate-slide-up">
-            <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 mb-4" />
-            <div className="px-4 pb-6 space-y-1">
-              <MoreButton
-                label="Продукція"
-                active={activeTab === 'products'}
-                onClick={() => handleMoreSelect('products')}
-              />
-              <MoreButton
-                label="Рух складу"
-                active={activeTab === 'movements'}
-                onClick={() => handleMoreSelect('movements')}
-              />
-              {canViewFinances() && (
-                <>
-                  <MoreButton
-                    label="Продажі"
-                    active={activeTab === 'sales'}
-                    onClick={() => handleMoreSelect('sales')}
-                  />
-                  <MoreButton
-                    label="Витрати"
-                    active={activeTab === 'expenses'}
-                    onClick={() => handleMoreSelect('expenses')}
-                  />
-                </>
-              )}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setMoreOpen(false)} />
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl pb-safe animate-slide-up">
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3" />
+            <div className="px-5 pt-5 pb-6">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Розділи</p>
+              <div className="space-y-1">
+                {visibleItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = activeTab === item.id
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleMoreSelect(item.id)}
+                      className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-base font-medium transition-all active:scale-[0.98] ${
+                        isActive
+                          ? 'bg-primary-50 text-primary-700'
+                          : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        isActive ? 'bg-primary-100' : 'bg-gray-100'
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      {item.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
-
-function MoreButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left px-4 py-3.5 rounded-xl text-base font-medium transition-colors ${
-        active ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50'
-      }`}
-    >
-      {label}
-    </button>
   )
 }

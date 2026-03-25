@@ -42,10 +42,11 @@ export function FeedbackButton({ userEmail }: FeedbackButtonProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+        className="flex items-center gap-2 h-11 px-3.5 rounded-xl text-sm font-medium text-gray-600 hover:text-blue-700 hover:bg-blue-50 active:scale-[0.97] transition-all"
         title="Повідомити проблему"
       >
-        <MessageSquarePlus className="w-5 h-5" />
+        <MessageSquarePlus className="w-4.5 h-4.5" />
+        <span className="hidden sm:inline">Відгук</span>
       </button>
 
       <Sheet open={open} onClose={() => setOpen(false)} title="Зворотній зв'язок">
@@ -54,14 +55,14 @@ export function FeedbackButton({ userEmail }: FeedbackButtonProps) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Опишіть проблему або пропозицію..."
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             rows={5}
             required
           />
           <button
             type="submit"
             disabled={sending || !text.trim()}
-            className="w-full py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="w-full py-3.5 bg-primary-600 text-white rounded-2xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {sending ? 'Надсилання...' : 'Надіслати'}
           </button>

@@ -4,7 +4,7 @@
 
 ## Огляд проєкту
 
-**Betblock v3.0** — SPA для управління виробництвом та обліку на підприємстві з виробництва будівельних блоків. Інтерфейс — українською мовою. Mobile-first дизайн.
+**Betblock v3.0** — SPA для управління виробництвом та обліку на підприємстві з виробництва будівельних блоків. Інтерфейс — українською мовою. Mobile-first дизайн (цільовий пристрій — iPhone 13, 390×844).
 
 ## Стек
 
@@ -110,3 +110,20 @@ Firestore `users/{uid}.role`:
 ## Firestore Rules
 
 `firestore.rules` — правила безпеки Firestore, деплояться через `firebase deploy --only firestore:rules`.
+
+## Дизайн-система
+
+### Кольори
+- **Primary** (Industrial Blue): `#2d6bff` — основний, глибокий синій
+- **Accent** (Amber/Copper): `#f97f07` — теплий акцент для попереджень та highlights
+- Визначені через `@theme` в `src/styles/globals.css`
+
+### Принципи UI
+- **Touch targets**: мінімум 44×44px для всіх інтерактивних елементів (кнопки `w-11 h-11`)
+- **Rounded**: `rounded-2xl` для карток, `rounded-xl` для кнопок та інпутів
+- **Header**: лого + dark mode + role badge + меню "Інструменти" (export/feedback) + logout. Не більше 4-5 елементів в ряд
+- **Backdrop blur**: `backdrop-blur-md` на Header і BottomNav для ефекту скла
+- **Active feedback**: `active:scale-95` на всіх кнопках
+- **Sheet**: `max-h-[85vh]`, safe-area bottom padding, drag-handle зверху
+- **FAB**: `bottom-22` на мобілці (щоб не перекривати BottomNav)
+- **Dark mode**: фон `#0c0f16`, картки `#161a24`, бордери `#252a36`
