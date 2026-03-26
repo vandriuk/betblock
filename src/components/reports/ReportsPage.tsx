@@ -124,13 +124,13 @@ export function ReportsPage() {
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} width={50} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
+              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#94a3b8' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={50} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
               <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '14px' }}
                 formatter={(value, name) => [formatCurrency(Number(value)), name === 'revenue' ? 'Дохід' : 'Витрати']}
               />
-              <Legend formatter={(value) => value === 'revenue' ? 'Дохід' : 'Витрати'} />
+              <Legend formatter={(value) => value === 'revenue' ? 'Дохід' : 'Витрати'} wrapperStyle={{ fontSize: '13px' }} />
               <Bar dataKey="revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
               <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -145,10 +145,10 @@ export function ReportsPage() {
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} width={50} />
+              <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#94a3b8' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={50} />
               <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '14px' }}
                 formatter={(value) => [`${value} шт`, 'Вироблено']}
               />
               <Bar dataKey="blocks" fill="#3b82f6" radius={[4, 4, 0, 0]} />
@@ -161,7 +161,7 @@ export function ReportsPage() {
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <h3 className="text-xs font-semibold text-gray-500 uppercase px-4 pt-4 pb-2">Деталізація</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm md:text-base">
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Місяць</th>

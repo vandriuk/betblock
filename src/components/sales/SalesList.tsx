@@ -24,7 +24,7 @@ export function SalesList({ items, onTogglePaid, onEdit, onDelete }: SalesListPr
                 <span className="font-semibold text-gray-900">{sale.customer}</span>
                 <button
                   onClick={(e) => { e.stopPropagation(); onTogglePaid(sale) }}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold active:scale-95 ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold active:scale-95 ${
                     sale.paid
                       ? 'bg-green-100 text-green-700'
                       : 'bg-red-100 text-red-700'

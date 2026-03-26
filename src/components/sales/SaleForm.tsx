@@ -74,7 +74,7 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           required
         />
       </div>
@@ -90,7 +90,7 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
         <select
           value={productName}
           onChange={(e) => handleProductChange(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
           required
         >
           {products.map((p) => (
@@ -98,14 +98,15 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Кількість</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Кількість (шт)</label>
           <input
             type="number"
+            inputMode="numeric"
             value={blocks || ''}
             onChange={(e) => setBlocks(Number(e.target.value))}
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none ${
+            className={`w-full px-4 py-3 border rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none ${
               overStock ? 'border-orange-300 bg-orange-50' : 'border-gray-200'
             }`}
             min="1"
@@ -116,24 +117,26 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Піддонів</label>
           <input
             type="number"
+            inputMode="numeric"
             value={pallets || ''}
             onChange={(e) => setPallets(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             min="0"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Ціна (₴)</label>
-          <input
-            type="number"
-            value={price || ''}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-            min="0.01"
-            step="0.01"
-            required
-          />
-        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Ціна за шт (₴)</label>
+        <input
+          type="number"
+          inputMode="decimal"
+          value={price || ''}
+          onChange={(e) => setPrice(Number(e.target.value))}
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          min="0.01"
+          step="0.01"
+          required
+        />
       </div>
 
       {overStock && (
@@ -149,14 +152,14 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
           <span className="text-lg font-bold text-primary-700">{(blocks * price).toLocaleString('uk-UA')} ₴</span>
         </div>
       )}
-      <label className="flex items-center gap-3 py-2 cursor-pointer">
+      <label className="flex items-center gap-3 py-3 cursor-pointer active:bg-gray-50 rounded-xl px-1 -mx-1">
         <input
           type="checkbox"
           checked={paid}
           onChange={(e) => setPaid(e.target.checked)}
-          className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+          className="w-6 h-6 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
         />
-        <span className="text-sm font-medium text-gray-700">Оплачено</span>
+        <span className="text-base font-medium text-gray-700">Оплачено</span>
       </label>
       {!formId && (
         <button

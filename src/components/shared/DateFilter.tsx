@@ -80,7 +80,7 @@ export function DateFilter({ value, onPreset, customFrom, customTo, onCustomChan
               setShowCustom(false)
             }}
             className={cn(
-              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all',
+              'px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all',
               value === p.id
                 ? 'bg-primary-600 text-white'
                 : 'bg-gray-100 text-gray-600 active:bg-gray-200',
@@ -97,7 +97,7 @@ export function DateFilter({ value, onPreset, customFrom, customTo, onCustomChan
             }
           }}
           className={cn(
-            'px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5',
+            'px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5',
             value === 'custom'
               ? 'bg-primary-600 text-white'
               : 'bg-gray-100 text-gray-600 active:bg-gray-200',
@@ -114,13 +114,13 @@ export function DateFilter({ value, onPreset, customFrom, customTo, onCustomChan
             type="date"
             value={customFrom || ''}
             onChange={(e) => onCustomChange(e.target.value, customTo || '')}
-            className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="flex-1 px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           />
           <input
             type="date"
             value={customTo || ''}
             onChange={(e) => onCustomChange(customFrom || '', e.target.value)}
-            className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="flex-1 px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           />
         </div>
       )}

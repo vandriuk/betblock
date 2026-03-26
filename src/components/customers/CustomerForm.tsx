@@ -33,7 +33,7 @@ export function CustomerForm({ formId, initial, onSubmit }: CustomerFormProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           placeholder="Іван Петренко"
           required
         />
@@ -42,9 +42,10 @@ export function CustomerForm({ formId, initial, onSubmit }: CustomerFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Телефон</label>
         <input
           type="tel"
+          inputMode="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           placeholder="+380..."
         />
       </div>
@@ -53,7 +54,7 @@ export function CustomerForm({ formId, initial, onSubmit }: CustomerFormProps) {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
           rows={2}
           placeholder="Необов'язково"
         />

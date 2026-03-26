@@ -48,7 +48,7 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           required
         />
       </div>
@@ -62,7 +62,7 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
           <select
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
             required
           >
             {products.map((p) => (
@@ -74,9 +74,10 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Кількість</label>
           <input
             type="number"
+            inputMode="numeric"
             value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             min="1"
             required
           />
@@ -87,7 +88,7 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
           rows={2}
           placeholder="Необов'язково"
         />

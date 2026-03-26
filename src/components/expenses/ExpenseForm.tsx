@@ -62,7 +62,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           required
         />
       </div>
@@ -71,7 +71,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
         <select
           value={category}
           onChange={(e) => handleCategoryChange(e.target.value as ExpenseCategory)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
         >
           {EXPENSE_CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -84,7 +84,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           placeholder={isMaterial ? 'Закупівля цементу' : 'На що витрачено'}
           required
         />
@@ -93,9 +93,10 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Сума (₴)</label>
         <input
           type="number"
+          inputMode="decimal"
           value={amount || ''}
           onChange={(e) => setAmount(Number(e.target.value))}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           min="0.01"
           step="0.01"
           placeholder="1000"
@@ -116,7 +117,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
               <select
                 value={materialName}
                 onChange={(e) => setMaterialName(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
               >
                 {inventory.map((inv) => (
                   <option key={inv.docId || inv.id} value={inv.name}>
@@ -131,9 +132,10 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
               </label>
               <input
                 type="number"
+                inputMode="decimal"
                 value={materialQuantity || ''}
                 onChange={(e) => setMaterialQuantity(Number(e.target.value))}
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                 min="0"
                 step="0.01"
                 placeholder="1000"

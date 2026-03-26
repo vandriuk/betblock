@@ -32,7 +32,7 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           placeholder="Цемент"
           required
         />
@@ -42,9 +42,10 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Кількість</label>
           <input
             type="number"
+            inputMode="decimal"
             value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             min="0"
           />
         </div>
@@ -53,7 +54,7 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
           <select
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
           >
             <option value="кг">кг</option>
             <option value="т">т</option>
@@ -68,9 +69,10 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Мін. запас</label>
           <input
             type="number"
+            inputMode="decimal"
             value={minQuantity || ''}
             onChange={(e) => setMinQuantity(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             min="0"
           />
         </div>
@@ -78,9 +80,10 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Ціна (₴)</label>
           <input
             type="number"
+            inputMode="decimal"
             value={price || ''}
             onChange={(e) => setPrice(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
             min="0"
             step="0.01"
           />
@@ -91,7 +94,7 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати',
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
           rows={2}
           placeholder="Необов'язково"
         />

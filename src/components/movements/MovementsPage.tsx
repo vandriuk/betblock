@@ -71,7 +71,7 @@ export function MovementsPage() {
               <button
                 key={t || 'all'}
                 onClick={() => setTypeFilter(t)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   typeFilter === t
                     ? 'bg-primary-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

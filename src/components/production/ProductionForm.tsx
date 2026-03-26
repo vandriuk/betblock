@@ -76,7 +76,7 @@ export function ProductionForm({ products, inventory, userEmail, formId, initial
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           required
         />
       </div>
@@ -104,7 +104,7 @@ export function ProductionForm({ products, inventory, userEmail, formId, initial
         <select
           value={productName}
           onChange={(e) => { setProductName(e.target.value); setError(null) }}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
           required
         >
           {products.map((p) => (
@@ -121,9 +121,10 @@ export function ProductionForm({ products, inventory, userEmail, formId, initial
         </label>
         <input
           type="number"
+          inputMode="numeric"
           value={blocks || ''}
           onChange={(e) => { setBlocks(Number(e.target.value)); setError(null) }}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           min="1"
           placeholder="100"
           required

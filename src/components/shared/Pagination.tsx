@@ -25,7 +25,7 @@ export function Pagination({ page, totalPages, onPageChange, totalItems, pageSiz
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
           className={cn(
-            'w-9 h-9 flex items-center justify-center rounded-lg transition-colors',
+            'w-11 h-11 flex items-center justify-center rounded-lg transition-colors',
             page <= 1 ? 'text-gray-300' : 'text-gray-600 active:bg-gray-100'
           )}
         >
@@ -33,13 +33,13 @@ export function Pagination({ page, totalPages, onPageChange, totalItems, pageSiz
         </button>
         {getPageNumbers(page, totalPages).map((p, i) =>
           p === '...' ? (
-            <span key={`dots-${i}`} className="w-9 h-9 flex items-center justify-center text-xs text-gray-400">…</span>
+            <span key={`dots-${i}`} className="w-11 h-11 flex items-center justify-center text-xs text-gray-400">…</span>
           ) : (
             <button
               key={p}
               onClick={() => onPageChange(p as number)}
               className={cn(
-                'w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors',
+                'w-11 h-11 flex items-center justify-center rounded-lg text-sm font-medium transition-colors',
                 p === page
                   ? 'bg-primary-600 text-white'
                   : 'text-gray-600 active:bg-gray-100'
@@ -53,7 +53,7 @@ export function Pagination({ page, totalPages, onPageChange, totalItems, pageSiz
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
           className={cn(
-            'w-9 h-9 flex items-center justify-center rounded-lg transition-colors',
+            'w-11 h-11 flex items-center justify-center rounded-lg transition-colors',
             page >= totalPages ? 'text-gray-300' : 'text-gray-600 active:bg-gray-100'
           )}
         >
