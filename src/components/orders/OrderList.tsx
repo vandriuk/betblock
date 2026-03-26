@@ -19,30 +19,30 @@ export function OrderList({ items, canEdit, onStatusChange, onDelete, onCreateSa
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {items.map((order) => {
         const next = getNextStatus(order.status)
         const canConvert = canEdit && order.status === 'Готово' && !order.saleId
         return (
           <div
             key={order.docId || order.id}
-            className="bg-white border border-gray-200 rounded-2xl p-4"
+            className="bg-white border border-gray-200 rounded-xl p-4"
           >
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-bold text-gray-900">{order.customer}</span>
+                  <span className="font-semibold text-gray-900">{order.customer}</span>
                   <OrderStatusBadge
                     status={order.status}
                     onClick={canEdit && next ? () => onStatusChange(order, next) : undefined}
                   />
                   {order.saleId && (
-                    <span className="px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-purple-100 text-purple-700">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                       Продаж створено
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-1.5 text-sm text-gray-500">
+                <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                   <span>{formatDate(order.date)}</span>
                   <span>{order.productName}</span>
                   <span className="font-bold text-gray-900">{order.quantity} шт</span>
@@ -51,22 +51,22 @@ export function OrderList({ items, canEdit, onStatusChange, onDelete, onCreateSa
                   <p className="text-xs text-gray-400 mt-1.5">{order.notes}</p>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center shrink-0">
                 {canConvert && onCreateSale && (
                   <button
                     onClick={() => onCreateSale(order)}
-                    className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-green-600 hover:bg-green-50 active:scale-95 transition-all"
+                    className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-green-600 active:bg-green-50"
                     title="Створити продаж"
                   >
-                    <ShoppingCart className="w-4.5 h-4.5" />
+                    <ShoppingCart className="w-5 h-5" />
                   </button>
                 )}
                 {canEdit && (
                   <button
                     onClick={() => onDelete(order)}
-                    className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 active:scale-95 transition-all"
+                    className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-red-500 active:bg-red-50"
                   >
-                    <Trash2 className="w-4.5 h-4.5" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>

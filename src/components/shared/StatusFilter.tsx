@@ -13,8 +13,8 @@ export function StatusFilter<T extends string>({ options, selected, onSelect, co
       <button
         onClick={() => onSelect(null)}
         className={cn(
-          'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95',
-          !selected ? 'bg-primary-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          'px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0',
+          !selected ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 active:bg-gray-200'
         )}
       >
         Всі
@@ -24,10 +24,10 @@ export function StatusFilter<T extends string>({ options, selected, onSelect, co
           key={opt}
           onClick={() => onSelect(selected === opt ? null : opt)}
           className={cn(
-            'px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95',
+            'px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0',
             selected === opt
-              ? (colors?.[opt] || 'bg-primary-600 text-white shadow-sm')
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? (colors?.[opt] || 'bg-primary-600 text-white')
+              : 'bg-gray-100 text-gray-600 active:bg-gray-200'
           )}
         >
           {opt}
