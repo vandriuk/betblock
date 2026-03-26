@@ -3,6 +3,8 @@ import { useData } from '@/contexts/DataContext'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import { formatDate } from '@/lib/utils'
 import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '@/lib/constants'
 import { ArrowDownCircle, ArrowUpCircle, Factory, Settings } from 'lucide-react'
@@ -42,6 +44,8 @@ export function MovementsPage() {
     }
     return result
   }, [movements, search, typeFilter, datePreset, customFrom, customTo])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const types: (MovementType | null)[] = [null, 'income', 'expense', 'production', 'adjustment']
 
@@ -86,8 +90,9 @@ export function MovementsPage() {
           message={movements.length === 0 ? 'Записи з\'являться при виробництві' : 'Спробуйте інший пошук'}
         />
       ) : (
+        <>
         <div className="space-y-2">
-          {filtered.map((m) => {
+          {paged.map((m) => {
             const Icon = ICON_MAP[m.type]
             const isPositive = m.quantity > 0
             return (
@@ -121,6 +126,8 @@ export function MovementsPage() {
             )
           })}
         </div>
+        <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
     </div>
   )

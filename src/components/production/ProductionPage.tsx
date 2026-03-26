@@ -9,6 +9,8 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import type { ProductionRecord } from '@/types'
 
 export function ProductionPage() {
@@ -40,6 +42,8 @@ export function ProductionPage() {
     }
     return result
   }, [production, search, datePreset, customFrom, customTo])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const handleAdd = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
     const result = await addProductionWithDeduction(data)
@@ -90,12 +94,15 @@ export function ProductionPage() {
           message={production.length === 0 ? 'Додайте запис виробництва' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <ProductionList
-          items={filtered}
-          canDelete={canEdit()}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-        />
+        <>
+          <ProductionList
+            items={paged}
+            canDelete={canEdit()}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+          />
+          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
 
       {/* Workers can also add production records */}

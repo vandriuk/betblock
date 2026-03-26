@@ -8,6 +8,8 @@ import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import type { Customer } from '@/types'
 
 export function CustomersPage() {
@@ -25,6 +27,8 @@ export function CustomersPage() {
       c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)
     )
   }, [customers, search])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const handleAdd = async (data: Omit<Customer, 'id' | 'docId'>) => {
     await addItem('customers', data)
@@ -62,13 +66,16 @@ export function CustomersPage() {
           message={customers.length === 0 ? 'Додайте першого клієнта' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <CustomerList
-          customers={filtered}
-          orders={orders}
-          sales={sales}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-        />
+        <>
+          <CustomerList
+            customers={paged}
+            orders={orders}
+            sales={sales}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+          />
+          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}

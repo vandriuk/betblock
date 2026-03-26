@@ -11,6 +11,8 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import { StatusFilter } from '@/components/shared/StatusFilter'
 import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import type { Expense, ExpenseCategory } from '@/types'
 
 export function ExpensesPage() {
@@ -42,6 +44,8 @@ export function ExpensesPage() {
     }
     return result
   }, [expenses, categoryFilter, search, datePreset, customFrom, customTo])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const handleAdd = async (data: Omit<Expense, 'id' | 'docId'>) => {
     await addExpenseWithInventory(data)
@@ -93,7 +97,10 @@ export function ExpensesPage() {
           message={expenses.length === 0 ? 'Додайте першу витрату' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <ExpensesList items={filtered} onEdit={setEditing} onDelete={setDeleting} />
+        <>
+          <ExpensesList items={paged} onEdit={setEditing} onDelete={setDeleting} />
+          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
 
       <FAB onClick={() => setShowForm(true)} />

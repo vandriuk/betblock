@@ -11,6 +11,8 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import { StatusFilter } from '@/components/shared/StatusFilter'
 import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { ORDER_STATUSES } from '@/lib/constants'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import type { Order, OrderStatus } from '@/types'
 
 export function OrdersPage() {
@@ -44,6 +46,8 @@ export function OrdersPage() {
     }
     return result
   }, [orders, statusFilter, search, datePreset, customFrom, customTo])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const handleAdd = async (data: Omit<Order, 'id' | 'docId'>) => {
     await addItem('orders', data)
@@ -105,14 +109,17 @@ export function OrdersPage() {
           message={orders.length === 0 ? 'Створіть перше замовлення' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <OrderList
-          items={filtered}
-          canEdit={canEdit()}
-          onStatusChange={handleStatusChange}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-          onCreateSale={handleCreateSale}
-        />
+        <>
+          <OrderList
+            items={paged}
+            canEdit={canEdit()}
+            onStatusChange={handleStatusChange}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+            onCreateSale={handleCreateSale}
+          />
+          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}

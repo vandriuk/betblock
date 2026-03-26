@@ -9,6 +9,8 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
+import { Pagination } from '@/components/shared/Pagination'
+import { usePagination } from '@/hooks/usePagination'
 import type { Sale } from '@/types'
 
 export function SalesPage() {
@@ -40,6 +42,8 @@ export function SalesPage() {
     }
     return result
   }, [sales, search, datePreset, customFrom, customTo])
+
+  const { paged, page, totalPages, totalItems, pageSize, onPageChange } = usePagination(filtered)
 
   const handleAdd = async (data: Omit<Sale, 'id' | 'docId'>) => {
     await addItem('sales', data)
@@ -91,12 +95,15 @@ export function SalesPage() {
           message={sales.length === 0 ? 'Додайте перший продаж' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <SalesList
-          items={filtered}
-          onTogglePaid={handleTogglePaid}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-        />
+        <>
+          <SalesList
+            items={paged}
+            onTogglePaid={handleTogglePaid}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+          />
+          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} totalItems={totalItems} pageSize={pageSize} />
+        </>
       )}
 
       <FAB onClick={() => setShowForm(true)} />
