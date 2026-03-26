@@ -1,4 +1,4 @@
-import { Trash2, ShoppingCart, Pencil } from 'lucide-react'
+import { Trash2, ShoppingCart } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { ORDER_STATUSES } from '@/lib/constants'
 import { OrderStatusBadge } from './OrderStatusBadge'

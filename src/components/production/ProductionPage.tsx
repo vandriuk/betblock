@@ -49,8 +49,8 @@ export function ProductionPage() {
     return result
   }
 
-  const handleEdit = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
-    if (!editing) return
+  const handleEdit = async (data: Omit<ProductionRecord, 'id' | 'docId'>): Promise<{ success: boolean; error?: string }> => {
+    if (!editing) return { success: false, error: 'Немає запису для редагування' }
     const id = editing.docId || String(editing.id)
     await updateItem('production', id, data)
     setEditing(null)
