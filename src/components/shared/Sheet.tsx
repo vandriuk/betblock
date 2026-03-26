@@ -19,7 +19,7 @@ export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[60] bg-white dark:bg-gray-900 flex flex-col" style={{ height: '80%' }}>
+    <div className="fixed inset-x-0 top-0 z-[60] bg-white dark:bg-gray-900 flex flex-col" style={{ height: '60%' }}>
       {/* Header — fixed at top */}
       <div className="shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4">
         <div className="flex items-center justify-between h-14">
