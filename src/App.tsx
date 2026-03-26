@@ -17,6 +17,7 @@ const SalesPage = lazy(() => import('@/components/sales/SalesPage').then(m => ({
 const ExpensesPage = lazy(() => import('@/components/expenses/ExpensesPage').then(m => ({ default: m.ExpensesPage })))
 const MovementsPage = lazy(() => import('@/components/movements/MovementsPage').then(m => ({ default: m.MovementsPage })))
 const CustomersPage = lazy(() => import('@/components/customers/CustomersPage').then(m => ({ default: m.CustomersPage })))
+const ReportsPage = lazy(() => import('@/components/reports/ReportsPage').then(m => ({ default: m.ReportsPage })))
 const UsersPage = lazy(() => import('@/components/users/UsersPage').then(m => ({ default: m.UsersPage })))
 
 function PageLoader() {
@@ -58,6 +59,7 @@ function AppContent() {
     sales: <SalesPage />,
     expenses: <ExpensesPage />,
     customers: <CustomersPage />,
+    reports: <ReportsPage />,
     users: <UsersPage />,
   }
 

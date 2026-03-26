@@ -41,6 +41,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
     ...(canViewFinances() ? [
       { id: 'sales' as const, label: 'Продажі' },
       { id: 'expenses' as const, label: 'Витрати' },
+      { id: 'reports' as const, label: 'Звіти' },
     ] : []),
     ...(isAdmin() ? [
       { id: 'users' as const, label: 'Користувачі' },

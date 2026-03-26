@@ -8,6 +8,7 @@ import {
   Boxes,
   ArrowLeftRight,
   UserCircle,
+  FileBarChart,
   Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,7 @@ const NAV_ITEMS: { id: TabId; label: string; icon: typeof BarChart3; finance?: b
   { id: 'movements', label: 'Рух складу', icon: ArrowLeftRight },
   { id: 'sales', label: 'Продажі', icon: ShoppingCart, finance: true },
   { id: 'expenses', label: 'Витрати', icon: DollarSign, finance: true },
+  { id: 'reports', label: 'Звіти', icon: FileBarChart, finance: true },
   { id: 'users', label: 'Користувачі', icon: Users, admin: true },
 ]
 
