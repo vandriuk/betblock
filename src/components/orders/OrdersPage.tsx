@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { StatusFilter } from '@/components/shared/StatusFilter'
+import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { ORDER_STATUSES } from '@/lib/constants'
 import type { Order, OrderStatus } from '@/types'
 
@@ -19,9 +20,20 @@ export function OrdersPage() {
   const [deleting, setDeleting] = useState<Order | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null)
+  const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
 
   const filtered = useMemo(() => {
-    let result = orders
+    let result = filterByDate(orders, datePreset === 'custom' ? 'all' : datePreset, customFrom, customTo)
+    if (datePreset === 'custom' && (customFrom || customTo)) {
+      result = result.filter((o) => {
+        const d = o.date.split('T')[0]
+        if (customFrom && d < customFrom) return false
+        if (customTo && d > customTo) return false
+        return true
+      })
+    }
     if (statusFilter) result = result.filter((o) => o.status === statusFilter)
     if (search) {
       const q = search.toLowerCase()
@@ -30,7 +42,7 @@ export function OrdersPage() {
       )
     }
     return result
-  }, [orders, statusFilter, search])
+  }, [orders, statusFilter, search, datePreset, customFrom, customTo])
 
   const handleAdd = async (data: Omit<Order, 'id' | 'docId'>) => {
     await addItem('orders', data)
@@ -64,6 +76,13 @@ export function OrdersPage() {
       {orders.length > 0 && (
         <div className="space-y-3">
           <SearchBar value={search} onChange={setSearch} placeholder="Пошук за клієнтом..." />
+          <DateFilter
+            value={datePreset}
+            onPreset={(p) => setDatePreset(p)}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomChange={(f, t) => { setDatePreset('custom'); setCustomFrom(f); setCustomTo(t) }}
+          />
           <StatusFilter
             options={ORDER_STATUSES}
             selected={statusFilter}

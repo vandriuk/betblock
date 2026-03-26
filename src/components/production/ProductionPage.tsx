@@ -8,6 +8,7 @@ import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
+import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import type { ProductionRecord } from '@/types'
 
 export function ProductionPage() {
@@ -16,14 +17,28 @@ export function ProductionPage() {
   const [showForm, setShowForm] = useState(false)
   const [deleting, setDeleting] = useState<ProductionRecord | null>(null)
   const [search, setSearch] = useState('')
+  const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
 
   const filtered = useMemo(() => {
-    if (!search) return production
-    const q = search.toLowerCase()
-    return production.filter((p) =>
-      p.productName.toLowerCase().includes(q) || p.createdBy.toLowerCase().includes(q)
-    )
-  }, [production, search])
+    let result = filterByDate(production, datePreset === 'custom' ? 'all' : datePreset, customFrom, customTo)
+    if (datePreset === 'custom' && (customFrom || customTo)) {
+      result = result.filter((p) => {
+        const d = p.date.split('T')[0]
+        if (customFrom && d < customFrom) return false
+        if (customTo && d > customTo) return false
+        return true
+      })
+    }
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter((p) =>
+        p.productName.toLowerCase().includes(q) || p.createdBy.toLowerCase().includes(q)
+      )
+    }
+    return result
+  }, [production, search, datePreset, customFrom, customTo])
 
   const handleAdd = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
     const result = await addProductionWithDeduction(data)
@@ -48,7 +63,16 @@ export function ProductionPage() {
       </div>
 
       {production.length > 0 && (
-        <SearchBar value={search} onChange={setSearch} placeholder="Пошук за продуктом або працівником..." />
+        <div className="space-y-3">
+          <SearchBar value={search} onChange={setSearch} placeholder="Пошук за продуктом або працівником..." />
+          <DateFilter
+            value={datePreset}
+            onPreset={(p) => setDatePreset(p)}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomChange={(f, t) => { setDatePreset('custom'); setCustomFrom(f); setCustomTo(t) }}
+          />
+        </div>
       )}
 
       {filtered.length === 0 ? (

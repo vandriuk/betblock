@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
 import { SearchBar } from '@/components/shared/SearchBar'
+import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { formatDate } from '@/lib/utils'
 import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '@/lib/constants'
@@ -18,9 +19,20 @@ export function MovementsPage() {
   const { movements } = useData()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<MovementType | null>(null)
+  const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
 
   const filtered = useMemo(() => {
-    let result = movements
+    let result = filterByDate(movements, datePreset === 'custom' ? 'all' : datePreset, customFrom, customTo)
+    if (datePreset === 'custom' && (customFrom || customTo)) {
+      result = result.filter((m) => {
+        const d = m.date.split('T')[0]
+        if (customFrom && d < customFrom) return false
+        if (customTo && d > customTo) return false
+        return true
+      })
+    }
     if (typeFilter) result = result.filter((m) => m.type === typeFilter)
     if (search) {
       const q = search.toLowerCase()
@@ -29,7 +41,7 @@ export function MovementsPage() {
       )
     }
     return result
-  }, [movements, search, typeFilter])
+  }, [movements, search, typeFilter, datePreset, customFrom, customTo])
 
   const types: (MovementType | null)[] = [null, 'income', 'expense', 'production', 'adjustment']
 
@@ -43,6 +55,13 @@ export function MovementsPage() {
       {movements.length > 0 && (
         <div className="space-y-3">
           <SearchBar value={search} onChange={setSearch} placeholder="Пошук за матеріалом..." />
+          <DateFilter
+            value={datePreset}
+            onPreset={(p) => setDatePreset(p)}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomChange={(f, t) => { setDatePreset('custom'); setCustomFrom(f); setCustomTo(t) }}
+          />
           <div className="flex gap-2 overflow-x-auto pb-1">
             {types.map((t) => (
               <button

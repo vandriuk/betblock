@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { StatusFilter } from '@/components/shared/StatusFilter'
+import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/DateFilter'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import type { Expense, ExpenseCategory } from '@/types'
 
@@ -19,16 +20,27 @@ export function ExpensesPage() {
   const [deleting, setDeleting] = useState<Expense | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | null>(null)
+  const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
 
   const filtered = useMemo(() => {
-    let result = expenses
+    let result = filterByDate(expenses, datePreset === 'custom' ? 'all' : datePreset, customFrom, customTo)
+    if (datePreset === 'custom' && (customFrom || customTo)) {
+      result = result.filter((e) => {
+        const d = e.date.split('T')[0]
+        if (customFrom && d < customFrom) return false
+        if (customTo && d > customTo) return false
+        return true
+      })
+    }
     if (categoryFilter) result = result.filter((e) => e.category === categoryFilter)
     if (search) {
       const q = search.toLowerCase()
       result = result.filter((e) => e.description.toLowerCase().includes(q))
     }
     return result
-  }, [expenses, categoryFilter, search])
+  }, [expenses, categoryFilter, search, datePreset, customFrom, customTo])
 
   const handleAdd = async (data: Omit<Expense, 'id' | 'docId'>) => {
     await addExpenseWithInventory(data)
@@ -52,6 +64,13 @@ export function ExpensesPage() {
       {expenses.length > 0 && (
         <div className="space-y-3">
           <SearchBar value={search} onChange={setSearch} placeholder="Пошук за описом..." />
+          <DateFilter
+            value={datePreset}
+            onPreset={(p) => setDatePreset(p)}
+            customFrom={customFrom}
+            customTo={customTo}
+            onCustomChange={(f, t) => { setDatePreset('custom'); setCustomFrom(f); setCustomTo(t) }}
+          />
           <StatusFilter
             options={EXPENSE_CATEGORIES}
             selected={categoryFilter}
