@@ -6,10 +6,11 @@ interface ProductFormProps {
   onSubmit: (name: string, price: number, recipe: RecipeItem[]) => void
   initial?: { name: string; price: number; recipe?: RecipeItem[] }
   submitLabel?: string
+  formId?: string
   inventory?: InventoryItem[]
 }
 
-export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', inventory = [] }: ProductFormProps) {
+export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', formId, inventory = [] }: ProductFormProps) {
   const [name, setName] = useState(initial?.name || '')
   const [price, setPrice] = useState(initial?.price || 0)
   const [recipe, setRecipe] = useState<RecipeItem[]>(initial?.recipe || [])
@@ -44,7 +45,7 @@ export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', i
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Назва</label>
         <input
@@ -125,12 +126,14 @@ export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', i
         )}
       </div>
 
-      <button
-        type="submit"
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
-      >
-        {submitLabel}
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+        >
+          {submitLabel}
+        </button>
+      )}
     </form>
   )
 }

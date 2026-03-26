@@ -68,9 +68,19 @@ export function SalesPage() {
 
       <FAB onClick={() => setShowForm(true)} />
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Новий продаж">
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Новий продаж"
+        footer={
+          <button type="submit" form="sale-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Додати продаж
+          </button>
+        }
+      >
         {user && (
           <SaleForm
+            formId="sale-form"
             products={products}
             production={production}
             sales={sales}

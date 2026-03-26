@@ -71,13 +71,31 @@ export function InventoryPage() {
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Новий матеріал">
-        <InventoryForm onSubmit={handleAdd} />
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Новий матеріал"
+        footer={
+          <button type="submit" form="inventory-add-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Додати
+          </button>
+        }
+      >
+        <InventoryForm formId="inventory-add-form" onSubmit={handleAdd} />
       </Sheet>
 
-      <Sheet open={!!editing} onClose={() => setEditing(null)} title="Редагування">
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="inventory-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
         {editing && (
-          <InventoryForm onSubmit={handleEdit} initial={editing} submitLabel="Зберегти" />
+          <InventoryForm formId="inventory-edit-form" onSubmit={handleEdit} initial={editing} submitLabel="Зберегти" />
         )}
       </Sheet>
 

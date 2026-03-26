@@ -60,13 +60,32 @@ export function ProductsPage() {
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Нова продукція">
-        <ProductForm onSubmit={handleAdd} inventory={inventory} />
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Нова продукція"
+        footer={
+          <button type="submit" form="product-add-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Додати
+          </button>
+        }
+      >
+        <ProductForm formId="product-add-form" onSubmit={handleAdd} inventory={inventory} />
       </Sheet>
 
-      <Sheet open={!!editing} onClose={() => setEditing(null)} title="Редагування">
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="product-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
         {editing && (
           <ProductForm
+            formId="product-edit-form"
             onSubmit={handleEdit}
             initial={{ name: editing.name, price: editing.price, recipe: editing.recipe }}
             submitLabel="Зберегти"

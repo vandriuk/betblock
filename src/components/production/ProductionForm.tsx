@@ -8,10 +8,11 @@ interface ProductionFormProps {
   products: Product[]
   inventory: InventoryItem[]
   userEmail: string
+  formId?: string
   onSubmit: (data: { date: string; shift: Shift; productName: string; blocks: number; createdBy: string }) => Promise<{ success: boolean; error?: string }>
 }
 
-export function ProductionForm({ products, inventory, userEmail, onSubmit }: ProductionFormProps) {
+export function ProductionForm({ products, inventory, userEmail, formId, onSubmit }: ProductionFormProps) {
   const [date, setDate] = useState(todayISO())
   const [shift, setShift] = useState<Shift>('Денна')
   const [productName, setProductName] = useState(products[0]?.name || '')
@@ -65,7 +66,7 @@ export function ProductionForm({ products, inventory, userEmail, onSubmit }: Pro
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Дата</label>
         <input
@@ -151,13 +152,15 @@ export function ProductionForm({ products, inventory, userEmail, onSubmit }: Pro
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
-      >
-        {submitting ? 'Обробка...' : 'Додати запис'}
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          {submitting ? 'Обробка...' : 'Додати запис'}
+        </button>
+      )}
     </form>
   )
 }

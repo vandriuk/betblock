@@ -71,9 +71,19 @@ export function ExpensesPage() {
 
       <FAB onClick={() => setShowForm(true)} />
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Нова витрата">
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Нова витрата"
+        footer={
+          <button type="submit" form="expense-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Додати витрату
+          </button>
+        }
+      >
         {user && (
           <ExpenseForm
+            formId="expense-form"
             userEmail={user.email}
             inventory={inventory}
             onSubmit={handleAdd}

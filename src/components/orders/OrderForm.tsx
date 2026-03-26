@@ -5,6 +5,7 @@ import type { Product } from '@/types'
 interface OrderFormProps {
   products: Product[]
   userEmail: string
+  formId?: string
   onSubmit: (data: {
     date: string
     customer: string
@@ -16,7 +17,7 @@ interface OrderFormProps {
   }) => void
 }
 
-export function OrderForm({ products, userEmail, onSubmit }: OrderFormProps) {
+export function OrderForm({ products, userEmail, formId, onSubmit }: OrderFormProps) {
   const [date, setDate] = useState(todayISO())
   const [customer, setCustomer] = useState('')
   const [productName, setProductName] = useState(products[0]?.name || '')
@@ -41,7 +42,7 @@ export function OrderForm({ products, userEmail, onSubmit }: OrderFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Дата</label>
         <input
@@ -99,12 +100,14 @@ export function OrderForm({ products, userEmail, onSubmit }: OrderFormProps) {
           placeholder="Необов'язково"
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
-      >
-        Створити замовлення
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+        >
+          Створити замовлення
+        </button>
+      )}
     </form>
   )
 }

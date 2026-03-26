@@ -51,8 +51,22 @@ export function FeedbackButton({ userEmail, onDone }: FeedbackButtonProps) {
         Зворотній зв'язок
       </button>
 
-      <Sheet open={open} onClose={() => setOpen(false)} title="Зворотній зв'язок">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <Sheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Зворотній зв'язок"
+        footer={
+          <button
+            type="submit"
+            form="feedback-form"
+            disabled={sending || !text.trim()}
+            className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold active:bg-primary-700 disabled:opacity-50"
+          >
+            {sending ? 'Надсилання...' : 'Надіслати'}
+          </button>
+        }
+      >
+        <form id="feedback-form" onSubmit={handleSubmit} className="space-y-4">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -61,13 +75,6 @@ export function FeedbackButton({ userEmail, onDone }: FeedbackButtonProps) {
             rows={5}
             required
           />
-          <button
-            type="submit"
-            disabled={sending || !text.trim()}
-            className="w-full py-4 bg-primary-600 text-white rounded-xl font-semibold active:bg-primary-700 disabled:opacity-50"
-          >
-            {sending ? 'Надсилання...' : 'Надіслати'}
-          </button>
         </form>
       </Sheet>
     </>

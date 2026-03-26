@@ -7,9 +7,10 @@ interface InventoryFormProps {
   onSubmit: (data: FormData) => void
   initial?: Partial<FormData>
   submitLabel?: string
+  formId?: string
 }
 
-export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати' }: InventoryFormProps) {
+export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати', formId }: InventoryFormProps) {
   const [name, setName] = useState(initial?.name || '')
   const [unit, setUnit] = useState(initial?.unit || 'кг')
   const [quantity, setQuantity] = useState(initial?.quantity || 0)
@@ -24,7 +25,7 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати' 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Назва</label>
         <input
@@ -95,12 +96,14 @@ export function InventoryForm({ onSubmit, initial, submitLabel = 'Додати' 
           placeholder="Необов'язково"
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
-      >
-        {submitLabel}
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+        >
+          {submitLabel}
+        </button>
+      )}
     </form>
   )
 }

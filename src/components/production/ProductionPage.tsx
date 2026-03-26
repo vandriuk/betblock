@@ -67,9 +67,19 @@ export function ProductionPage() {
       {/* Workers can also add production records */}
       {user && <FAB onClick={() => setShowForm(true)} />}
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Новий запис">
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Новий запис"
+        footer={
+          <button type="submit" form="production-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Додати запис
+          </button>
+        }
+      >
         {user && (
           <ProductionForm
+            formId="production-form"
             products={products}
             inventory={inventory}
             userEmail={user.email}

@@ -89,9 +89,18 @@ export function OrdersPage() {
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}
 
-      <Sheet open={showForm} onClose={() => setShowForm(false)} title="Нове замовлення">
+      <Sheet
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Нове замовлення"
+        footer={
+          <button type="submit" form="order-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Створити замовлення
+          </button>
+        }
+      >
         {user && (
-          <OrderForm products={products} userEmail={user.email} onSubmit={handleAdd} />
+          <OrderForm formId="order-form" products={products} userEmail={user.email} onSubmit={handleAdd} />
         )}
       </Sheet>
 

@@ -6,6 +6,7 @@ import type { ExpenseCategory, InventoryItem } from '@/types'
 
 interface ExpenseFormProps {
   userEmail: string
+  formId?: string
   inventory?: InventoryItem[]
   onSubmit: (data: {
     date: string
@@ -18,7 +19,7 @@ interface ExpenseFormProps {
   }) => void
 }
 
-export function ExpenseForm({ userEmail, inventory = [], onSubmit }: ExpenseFormProps) {
+export function ExpenseForm({ userEmail, formId, inventory = [], onSubmit }: ExpenseFormProps) {
   const [date, setDate] = useState(todayISO())
   const [category, setCategory] = useState<ExpenseCategory>('Сировина')
   const [description, setDescription] = useState('')
@@ -57,7 +58,7 @@ export function ExpenseForm({ userEmail, inventory = [], onSubmit }: ExpenseForm
   const selectedMaterial = inventory.find((inv) => inv.name === materialName)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Дата</label>
         <input
@@ -153,12 +154,14 @@ export function ExpenseForm({ userEmail, inventory = [], onSubmit }: ExpenseForm
         </div>
       )}
 
-      <button
-        type="submit"
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
-      >
-        Додати витрату
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+        >
+          Додати витрату
+        </button>
+      )}
     </form>
   )
 }

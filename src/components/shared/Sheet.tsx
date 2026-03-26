@@ -6,18 +6,21 @@ interface SheetProps {
   onClose: () => void
   title: string
   children: ReactNode
+  /** Pinned footer — always visible at the bottom, never scrolls away */
+  footer?: ReactNode
 }
 
 /**
- * Full-screen modal page — no body scroll lock, no vh tricks, no position:fixed hacks.
- * Just a regular page that scrolls naturally on any touch device.
+ * Full-screen modal with pinned footer.
+ * The footer (submit button) is ALWAYS visible at the bottom — no scrolling needed to reach it.
+ * Content area scrolls independently above the footer.
  */
-export function Sheet({ open, onClose, title, children }: SheetProps) {
+export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
   if (!open) return null
 
   return (
     <div className="fixed inset-0 z-[60] bg-white dark:bg-gray-900 flex flex-col">
-      {/* Fixed header — never scrolls */}
+      {/* Header — fixed at top */}
       <div className="shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4">
         <div className="flex items-center justify-between h-14">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
@@ -30,15 +33,22 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
         </div>
       </div>
 
-      {/* Scrollable content — iOS Safari scrolls this reliably because it's a flex child, not the fixed element itself */}
+      {/* Scrollable content */}
       <div
-        className="flex-1 overflow-y-auto overscroll-contain"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        <div className="px-4 py-5 pb-[calc(env(safe-area-inset-bottom,20px)+20px)]">
+        <div className="px-4 py-4">
           {children}
         </div>
       </div>
+
+      {/* Pinned footer — always visible, never hidden by scroll */}
+      {footer && (
+        <div className="shrink-0 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,8px))] border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          {footer}
+        </div>
+      )}
     </div>
   )
 }

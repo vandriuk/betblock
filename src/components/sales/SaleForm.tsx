@@ -6,6 +6,7 @@ import type { Product, ProductionRecord, Sale } from '@/types'
 interface SaleFormProps {
   products: Product[]
   userEmail: string
+  formId?: string
   production?: ProductionRecord[]
   sales?: Sale[]
   onSubmit: (data: {
@@ -26,7 +27,7 @@ interface SaleFormProps {
   }
 }
 
-export function SaleForm({ products, userEmail, production = [], sales = [], onSubmit, initial }: SaleFormProps) {
+export function SaleForm({ products, userEmail, formId, production = [], sales = [], onSubmit, initial }: SaleFormProps) {
   const [date, setDate] = useState(todayISO())
   const [customer, setCustomer] = useState(initial?.customer || '')
   const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
@@ -74,7 +75,7 @@ export function SaleForm({ products, userEmail, production = [], sales = [], onS
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Дата</label>
         <input
@@ -172,12 +173,14 @@ export function SaleForm({ products, userEmail, production = [], sales = [], onS
         />
         <span className="text-sm font-medium text-gray-700">Оплачено</span>
       </label>
-      <button
-        type="submit"
-        className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
-      >
-        Додати продаж
-      </button>
+      {!formId && (
+        <button
+          type="submit"
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+        >
+          Додати продаж
+        </button>
+      )}
     </form>
   )
 }
