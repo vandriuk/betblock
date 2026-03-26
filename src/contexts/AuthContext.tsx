@@ -11,6 +11,7 @@ interface AuthContextValue {
   logout: () => Promise<void>
   canEdit: () => boolean
   canViewFinances: () => boolean
+  isAdmin: () => boolean
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -53,8 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return !!user && (user.role === 'admin' || user.role === 'manager')
   }
 
+  const isAdmin = () => {
+    return !!user && user.role === 'admin'
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, canEdit, canViewFinances }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, canEdit, canViewFinances, isAdmin }}>
       {children}
     </AuthContext.Provider>
   )

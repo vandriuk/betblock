@@ -32,12 +32,17 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
     setMoreOpen(false)
   }
 
+  const { isAdmin } = useAuth()
+
   const moreItems = [
     { id: 'products' as const, label: 'Продукція' },
     { id: 'movements' as const, label: 'Рух складу' },
     ...(canViewFinances() ? [
       { id: 'sales' as const, label: 'Продажі' },
       { id: 'expenses' as const, label: 'Витрати' },
+    ] : []),
+    ...(isAdmin() ? [
+      { id: 'users' as const, label: 'Користувачі' },
     ] : []),
   ]
 

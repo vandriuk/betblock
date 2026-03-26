@@ -8,6 +8,14 @@ export interface AppUser {
   role: UserRole
 }
 
+export interface UserRecord {
+  uid: string
+  docId?: string
+  email: string
+  role: UserRole
+  createdAt?: string
+}
+
 // === Inventory ===
 
 export interface InventoryItem {
