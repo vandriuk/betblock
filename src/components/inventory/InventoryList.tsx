@@ -1,4 +1,4 @@
-import { Pencil, Trash2, AlertTriangle } from 'lucide-react'
+import { Pencil, Trash2, AlertTriangle, ClipboardCheck } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { InventoryItem } from '@/types'
 
@@ -8,9 +8,10 @@ interface InventoryListProps {
   showPrices: boolean
   onEdit: (item: InventoryItem) => void
   onDelete: (item: InventoryItem) => void
+  onAdjust: (item: InventoryItem) => void
 }
 
-export function InventoryList({ items, canEdit, showPrices, onEdit, onDelete }: InventoryListProps) {
+export function InventoryList({ items, canEdit, showPrices, onEdit, onDelete, onAdjust }: InventoryListProps) {
   return (
     <div className="space-y-3">
       {items.map((item) => {
@@ -45,6 +46,13 @@ export function InventoryList({ items, canEdit, showPrices, onEdit, onDelete }: 
               </div>
               {canEdit && (
                 <div className="flex shrink-0 ml-2">
+                  <button
+                    onClick={() => onAdjust(item)}
+                    className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-amber-600 active:bg-amber-50"
+                    title="Коригування"
+                  >
+                    <ClipboardCheck className="w-5 h-5" />
+                  </button>
                   <button
                     onClick={() => onEdit(item)}
                     className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-primary-600 active:bg-primary-50"

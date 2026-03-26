@@ -3,19 +3,23 @@ import { useData } from '@/contexts/DataContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { InventoryList } from './InventoryList'
 import { InventoryForm } from './InventoryForm'
+import { AdjustmentForm } from './AdjustmentForm'
 import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
+import { addDocument } from '@/services/firestore'
+import { todayISO } from '@/lib/utils'
 import type { InventoryItem } from '@/types'
 
 export function InventoryPage() {
   const { inventory, addItem, updateItem, deleteItem } = useData()
-  const { canEdit, canViewFinances } = useAuth()
+  const { user, canEdit, canViewFinances } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<InventoryItem | null>(null)
   const [deleting, setDeleting] = useState<InventoryItem | null>(null)
+  const [adjusting, setAdjusting] = useState<InventoryItem | null>(null)
   const [search, setSearch] = useState('')
 
   const filtered = useMemo(() => {
@@ -34,6 +38,22 @@ export function InventoryPage() {
     const id = editing.docId || String(editing.id)
     await updateItem('inventory', id, data)
     setEditing(null)
+  }
+
+  const handleAdjust = async (newQuantity: number, reason: string) => {
+    if (!adjusting) return
+    const id = adjusting.docId || String(adjusting.id)
+    const diff = newQuantity - adjusting.quantity
+    await updateItem('inventory', id, { quantity: newQuantity })
+    await addDocument('movements', {
+      date: todayISO(),
+      materialName: adjusting.name,
+      type: 'adjustment',
+      quantity: diff,
+      reason: `Коригування: ${reason}`,
+      createdBy: user?.email || '',
+    })
+    setAdjusting(null)
   }
 
   const handleDelete = async () => {
@@ -66,6 +86,7 @@ export function InventoryPage() {
           showPrices={canViewFinances()}
           onEdit={setEditing}
           onDelete={setDeleting}
+          onAdjust={setAdjusting}
         />
       )}
 
@@ -96,6 +117,21 @@ export function InventoryPage() {
       >
         {editing && (
           <InventoryForm formId="inventory-edit-form" onSubmit={handleEdit} initial={editing} submitLabel="Зберегти" />
+        )}
+      </Sheet>
+
+      <Sheet
+        open={!!adjusting}
+        onClose={() => setAdjusting(null)}
+        title="Коригування залишку"
+        footer={
+          <button type="submit" form="inventory-adjust-form" className="w-full bg-amber-500 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти коригування
+          </button>
+        }
+      >
+        {adjusting && (
+          <AdjustmentForm formId="inventory-adjust-form" item={adjusting} onSubmit={handleAdjust} />
         )}
       </Sheet>
 
