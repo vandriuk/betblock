@@ -1,4 +1,5 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 interface SheetProps {
@@ -6,49 +7,55 @@ interface SheetProps {
   onClose: () => void
   title: string
   children: ReactNode
-  /** Pinned footer — always visible at the bottom, never scrolls away */
   footer?: ReactNode
 }
 
 /**
- * Full-screen modal with pinned footer.
- * The footer (submit button) is ALWAYS visible at the bottom — no scrolling needed to reach it.
- * Content area scrolls independently above the footer.
+ * Sheet renders as a regular page (no position:fixed) via portal.
+ * Hides #root and takes over the body — native browser scroll, works on all devices.
  */
 export function Sheet({ open, onClose, title, children, footer }: SheetProps) {
+  useEffect(() => {
+    if (!open) return
+    const root = document.getElementById('root')
+    if (root) root.style.display = 'none'
+    window.scrollTo(0, 0)
+    return () => {
+      if (root) root.style.display = ''
+    }
+  }, [open])
+
   if (!open) return null
 
-  return (
-    <div className="fixed inset-x-0 top-0 z-[60] bg-white dark:bg-gray-900 flex flex-col" style={{ height: '60%' }}>
-      {/* Header — fixed at top */}
-      <div className="shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4">
-        <div className="flex items-center justify-between h-14">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+  return createPortal(
+    <div
+      style={{ minHeight: '100vh', background: 'white', position: 'relative', zIndex: 60 }}
+    >
+      {/* Header */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'white', borderBottom: '1px solid #e5e7eb', padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 }}>{title}</h3>
           <button
             onClick={onClose}
-            className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-500 active:bg-gray-100 dark:active:bg-gray-800"
+            style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', borderRadius: 12, color: '#6b7280', cursor: 'pointer' }}
           >
-            <X className="w-6 h-6" />
+            <X style={{ width: 24, height: 24 }} />
           </button>
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-      >
-        <div className="px-4 py-4">
-          {children}
-        </div>
+      {/* Content — regular page flow, browser handles scroll */}
+      <div style={{ padding: '16px 16px 24px' }}>
+        {children}
       </div>
 
-      {/* Pinned footer — always visible, never hidden by scroll */}
+      {/* Footer — always at the end of content */}
       {footer && (
-        <div className="shrink-0 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,8px))] border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div style={{ padding: '12px 16px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 8px))', borderTop: '1px solid #e5e7eb', background: 'white', position: 'sticky', bottom: 0 }}>
           {footer}
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   )
 }
