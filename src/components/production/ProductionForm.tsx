@@ -2,21 +2,24 @@ import { useState, useMemo, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
 import { SHIFTS } from '@/lib/constants'
 import { AlertTriangle } from 'lucide-react'
-import type { Product, Shift, InventoryItem } from '@/types'
+import type { Product, Shift, InventoryItem, ProductionRecord } from '@/types'
+
+type FormData = Omit<ProductionRecord, 'id' | 'docId'>
 
 interface ProductionFormProps {
   products: Product[]
   inventory: InventoryItem[]
   userEmail: string
   formId?: string
-  onSubmit: (data: { date: string; shift: Shift; productName: string; blocks: number; createdBy: string }) => Promise<{ success: boolean; error?: string }>
+  initial?: Partial<FormData>
+  onSubmit: (data: FormData) => Promise<{ success: boolean; error?: string }>
 }
 
-export function ProductionForm({ products, inventory, userEmail, formId, onSubmit }: ProductionFormProps) {
-  const [date, setDate] = useState(todayISO())
-  const [shift, setShift] = useState<Shift>('Денна')
-  const [productName, setProductName] = useState(products[0]?.name || '')
-  const [blocks, setBlocks] = useState(0)
+export function ProductionForm({ products, inventory, userEmail, formId, initial, onSubmit }: ProductionFormProps) {
+  const [date, setDate] = useState(initial?.date || todayISO())
+  const [shift, setShift] = useState<Shift>(initial?.shift || 'Денна')
+  const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
+  const [blocks, setBlocks] = useState(initial?.blocks || 0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -54,11 +57,11 @@ export function ProductionForm({ products, inventory, userEmail, formId, onSubmi
     setSubmitting(true)
     setError(null)
 
-    const result = await onSubmit({ date, shift, productName, blocks, createdBy: userEmail })
+    const result = await onSubmit({ date, shift, productName, blocks, createdBy: initial?.createdBy || userEmail })
 
     if (!result.success) {
       setError(result.error || 'Невідома помилка')
-    } else {
+    } else if (!initial) {
       setBlocks(0)
       setError(null)
     }
@@ -158,7 +161,7 @@ export function ProductionForm({ products, inventory, userEmail, formId, onSubmi
           disabled={submitting}
           className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
         >
-          {submitting ? 'Обробка...' : 'Додати запис'}
+          {submitting ? 'Обробка...' : (initial ? 'Зберегти' : 'Додати запис')}
         </button>
       )}
     </form>

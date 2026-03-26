@@ -12,9 +12,10 @@ import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/D
 import type { ProductionRecord } from '@/types'
 
 export function ProductionPage() {
-  const { production, products, inventory, addProductionWithDeduction, deleteItem } = useData()
+  const { production, products, inventory, addProductionWithDeduction, updateItem, deleteItem } = useData()
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<ProductionRecord | null>(null)
   const [deleting, setDeleting] = useState<ProductionRecord | null>(null)
   const [search, setSearch] = useState('')
   const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
@@ -46,6 +47,14 @@ export function ProductionPage() {
       setShowForm(false)
     }
     return result
+  }
+
+  const handleEdit = async (data: Omit<ProductionRecord, 'id' | 'docId'>) => {
+    if (!editing) return
+    const id = editing.docId || String(editing.id)
+    await updateItem('production', id, data)
+    setEditing(null)
+    return { success: true }
   }
 
   const handleDelete = async () => {
@@ -84,6 +93,7 @@ export function ProductionPage() {
         <ProductionList
           items={filtered}
           canDelete={canEdit()}
+          onEdit={setEditing}
           onDelete={setDeleting}
         />
       )}
@@ -108,6 +118,28 @@ export function ProductionPage() {
             inventory={inventory}
             userEmail={user.email}
             onSubmit={handleAdd}
+          />
+        )}
+      </Sheet>
+
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="production-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
+        {editing && user && (
+          <ProductionForm
+            formId="production-edit-form"
+            products={products}
+            inventory={inventory}
+            userEmail={user.email}
+            initial={editing}
+            onSubmit={handleEdit}
           />
         )}
       </Sheet>

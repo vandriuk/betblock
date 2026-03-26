@@ -14,9 +14,10 @@ import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import type { Expense, ExpenseCategory } from '@/types'
 
 export function ExpensesPage() {
-  const { expenses, inventory, addExpenseWithInventory, deleteItem } = useData()
+  const { expenses, inventory, addExpenseWithInventory, updateItem, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<Expense | null>(null)
   const [deleting, setDeleting] = useState<Expense | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<ExpenseCategory | null>(null)
@@ -45,6 +46,13 @@ export function ExpensesPage() {
   const handleAdd = async (data: Omit<Expense, 'id' | 'docId'>) => {
     await addExpenseWithInventory(data)
     setShowForm(false)
+  }
+
+  const handleEdit = async (data: Omit<Expense, 'id' | 'docId'>) => {
+    if (!editing) return
+    const id = editing.docId || String(editing.id)
+    await updateItem('expenses', id, data)
+    setEditing(null)
   }
 
   const handleDelete = async () => {
@@ -85,7 +93,7 @@ export function ExpensesPage() {
           message={expenses.length === 0 ? 'Додайте першу витрату' : 'Спробуйте інший пошук'}
         />
       ) : (
-        <ExpensesList items={filtered} onDelete={setDeleting} />
+        <ExpensesList items={filtered} onEdit={setEditing} onDelete={setDeleting} />
       )}
 
       <FAB onClick={() => setShowForm(true)} />
@@ -106,6 +114,27 @@ export function ExpensesPage() {
             userEmail={user.email}
             inventory={inventory}
             onSubmit={handleAdd}
+          />
+        )}
+      </Sheet>
+
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="expense-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
+        {editing && user && (
+          <ExpenseForm
+            formId="expense-edit-form"
+            userEmail={user.email}
+            inventory={inventory}
+            initial={editing}
+            onSubmit={handleEdit}
           />
         )}
       </Sheet>

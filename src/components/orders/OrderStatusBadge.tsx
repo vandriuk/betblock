@@ -3,7 +3,7 @@ import type { OrderStatus } from '@/types'
 
 interface OrderStatusBadgeProps {
   status: OrderStatus
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent) => void
 }
 
 export function OrderStatusBadge({ status, onClick }: OrderStatusBadgeProps) {

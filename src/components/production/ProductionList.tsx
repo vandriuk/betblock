@@ -5,16 +5,18 @@ import type { ProductionRecord } from '@/types'
 interface ProductionListProps {
   items: ProductionRecord[]
   canDelete: boolean
+  onEdit: (item: ProductionRecord) => void
   onDelete: (item: ProductionRecord) => void
 }
 
-export function ProductionList({ items, canDelete, onDelete }: ProductionListProps) {
+export function ProductionList({ items, canDelete, onEdit, onDelete }: ProductionListProps) {
   return (
     <div className="space-y-2">
       {items.map((item) => (
         <div
           key={item.docId || item.id}
           className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between"
+          onClick={() => onEdit(item)}
         >
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -29,7 +31,7 @@ export function ProductionList({ items, canDelete, onDelete }: ProductionListPro
           </div>
           {canDelete && (
             <button
-              onClick={() => onDelete(item)}
+              onClick={(e) => { e.stopPropagation(); onDelete(item) }}
               className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-red-500 active:bg-red-50 shrink-0"
             >
               <Trash2 className="w-5 h-5" />

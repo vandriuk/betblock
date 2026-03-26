@@ -3,38 +3,26 @@ import { todayISO } from '@/lib/utils'
 import { AlertTriangle } from 'lucide-react'
 import type { Product, ProductionRecord, Sale } from '@/types'
 
+type FormData = Omit<Sale, 'id' | 'docId' | 'orderId' | 'saleId'>
+
 interface SaleFormProps {
   products: Product[]
   userEmail: string
   formId?: string
   production?: ProductionRecord[]
   sales?: Sale[]
-  onSubmit: (data: {
-    date: string
-    customer: string
-    productName: string
-    blocks: number
-    pallets: number
-    price: number
-    paid: boolean
-    createdBy: string
-  }) => void
-  initial?: {
-    customer?: string
-    productName?: string
-    blocks?: number
-    price?: number
-  }
+  onSubmit: (data: FormData) => void
+  initial?: Partial<FormData>
 }
 
 export function SaleForm({ products, userEmail, formId, production = [], sales = [], onSubmit, initial }: SaleFormProps) {
-  const [date, setDate] = useState(todayISO())
+  const [date, setDate] = useState(initial?.date || todayISO())
   const [customer, setCustomer] = useState(initial?.customer || '')
   const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
   const [blocks, setBlocks] = useState(initial?.blocks || 0)
-  const [pallets, setPallets] = useState(0)
+  const [pallets, setPallets] = useState(initial?.pallets || 0)
   const [price, setPrice] = useState(initial?.price || products[0]?.price || 0)
-  const [paid, setPaid] = useState(false)
+  const [paid, setPaid] = useState(initial?.paid ?? false)
 
   // Calculate stock for selected product
   const stock = useMemo(() => {
@@ -66,12 +54,14 @@ export function SaleForm({ products, userEmail, formId, production = [], sales =
       pallets,
       price,
       paid,
-      createdBy: userEmail,
+      createdBy: initial?.createdBy || userEmail,
     })
-    setCustomer('')
-    setBlocks(0)
-    setPallets(0)
-    setPaid(false)
+    if (!initial) {
+      setCustomer('')
+      setBlocks(0)
+      setPallets(0)
+      setPaid(false)
+    }
   }
 
   return (
@@ -178,7 +168,7 @@ export function SaleForm({ products, userEmail, formId, production = [], sales =
           type="submit"
           className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
         >
-          Додати продаж
+          {initial ? 'Зберегти' : 'Додати продаж'}
         </button>
       )}
     </form>

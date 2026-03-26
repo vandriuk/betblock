@@ -1,28 +1,23 @@
 import { useState, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
-import type { Product } from '@/types'
+import type { Order, Product } from '@/types'
+
+type FormData = Omit<Order, 'id' | 'docId' | 'saleId'>
 
 interface OrderFormProps {
   products: Product[]
   userEmail: string
   formId?: string
-  onSubmit: (data: {
-    date: string
-    customer: string
-    productName: string
-    quantity: number
-    status: 'Нове'
-    notes: string
-    createdBy: string
-  }) => void
+  initial?: Partial<FormData>
+  onSubmit: (data: FormData) => void
 }
 
-export function OrderForm({ products, userEmail, formId, onSubmit }: OrderFormProps) {
-  const [date, setDate] = useState(todayISO())
-  const [customer, setCustomer] = useState('')
-  const [productName, setProductName] = useState(products[0]?.name || '')
-  const [quantity, setQuantity] = useState(0)
-  const [notes, setNotes] = useState('')
+export function OrderForm({ products, userEmail, formId, initial, onSubmit }: OrderFormProps) {
+  const [date, setDate] = useState(initial?.date || todayISO())
+  const [customer, setCustomer] = useState(initial?.customer || '')
+  const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
+  const [quantity, setQuantity] = useState(initial?.quantity || 0)
+  const [notes, setNotes] = useState(initial?.notes || '')
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -32,13 +27,15 @@ export function OrderForm({ products, userEmail, formId, onSubmit }: OrderFormPr
       customer: customer.trim(),
       productName,
       quantity,
-      status: 'Нове',
+      status: initial?.status || 'Нове',
       notes,
-      createdBy: userEmail,
+      createdBy: initial?.createdBy || userEmail,
     })
-    setCustomer('')
-    setQuantity(0)
-    setNotes('')
+    if (!initial) {
+      setCustomer('')
+      setQuantity(0)
+      setNotes('')
+    }
   }
 
   return (
@@ -105,7 +102,7 @@ export function OrderForm({ products, userEmail, formId, onSubmit }: OrderFormPr
           type="submit"
           className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
         >
-          Створити замовлення
+          {initial ? 'Зберегти' : 'Створити замовлення'}
         </button>
       )}
     </form>

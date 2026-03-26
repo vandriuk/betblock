@@ -15,6 +15,7 @@ export function SalesPage() {
   const { sales, products, production, addItem, updateItem, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<Sale | null>(null)
   const [deleting, setDeleting] = useState<Sale | null>(null)
   const [search, setSearch] = useState('')
   const [datePreset, setDatePreset] = useState<DatePreset | 'custom'>('all')
@@ -43,6 +44,13 @@ export function SalesPage() {
   const handleAdd = async (data: Omit<Sale, 'id' | 'docId'>) => {
     await addItem('sales', data)
     setShowForm(false)
+  }
+
+  const handleEdit = async (data: Omit<Sale, 'id' | 'docId'>) => {
+    if (!editing) return
+    const id = editing.docId || String(editing.id)
+    await updateItem('sales', id, data)
+    setEditing(null)
   }
 
   const handleTogglePaid = async (sale: Sale) => {
@@ -86,6 +94,7 @@ export function SalesPage() {
         <SalesList
           items={filtered}
           onTogglePaid={handleTogglePaid}
+          onEdit={setEditing}
           onDelete={setDeleting}
         />
       )}
@@ -110,6 +119,29 @@ export function SalesPage() {
             sales={sales}
             userEmail={user.email}
             onSubmit={handleAdd}
+          />
+        )}
+      </Sheet>
+
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="sale-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
+        {editing && user && (
+          <SaleForm
+            formId="sale-edit-form"
+            products={products}
+            production={production}
+            sales={sales}
+            userEmail={user.email}
+            initial={editing}
+            onSubmit={handleEdit}
           />
         )}
       </Sheet>

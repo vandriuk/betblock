@@ -2,31 +2,26 @@ import { useState, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
 import { EXPENSE_CATEGORIES } from '@/lib/constants'
 import { Package } from 'lucide-react'
-import type { ExpenseCategory, InventoryItem } from '@/types'
+import type { Expense, ExpenseCategory, InventoryItem } from '@/types'
+
+type FormData = Omit<Expense, 'id' | 'docId'>
 
 interface ExpenseFormProps {
   userEmail: string
   formId?: string
   inventory?: InventoryItem[]
-  onSubmit: (data: {
-    date: string
-    category: ExpenseCategory
-    description: string
-    amount: number
-    createdBy: string
-    materialName?: string
-    materialQuantity?: number
-  }) => void
+  initial?: Partial<FormData>
+  onSubmit: (data: FormData) => void
 }
 
-export function ExpenseForm({ userEmail, formId, inventory = [], onSubmit }: ExpenseFormProps) {
-  const [date, setDate] = useState(todayISO())
-  const [category, setCategory] = useState<ExpenseCategory>('Сировина')
-  const [description, setDescription] = useState('')
-  const [amount, setAmount] = useState(0)
+export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubmit }: ExpenseFormProps) {
+  const [date, setDate] = useState(initial?.date || todayISO())
+  const [category, setCategory] = useState<ExpenseCategory>(initial?.category || 'Сировина')
+  const [description, setDescription] = useState(initial?.description || '')
+  const [amount, setAmount] = useState(initial?.amount || 0)
   // Material fields (only for "Сировина")
-  const [materialName, setMaterialName] = useState(inventory[0]?.name || '')
-  const [materialQuantity, setMaterialQuantity] = useState(0)
+  const [materialName, setMaterialName] = useState(initial?.materialName || inventory[0]?.name || '')
+  const [materialQuantity, setMaterialQuantity] = useState(initial?.materialQuantity || 0)
 
   const isMaterial = category === 'Сировина'
 
@@ -45,14 +40,16 @@ export function ExpenseForm({ userEmail, formId, inventory = [], onSubmit }: Exp
       category,
       description: description.trim(),
       amount,
-      createdBy: userEmail,
+      createdBy: initial?.createdBy || userEmail,
       ...(isMaterial && materialName && materialQuantity > 0
         ? { materialName, materialQuantity }
         : {}),
     })
-    setDescription('')
-    setAmount(0)
-    setMaterialQuantity(0)
+    if (!initial) {
+      setDescription('')
+      setAmount(0)
+      setMaterialQuantity(0)
+    }
   }
 
   const selectedMaterial = inventory.find((inv) => inv.name === materialName)
@@ -159,7 +156,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], onSubmit }: Exp
           type="submit"
           className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
         >
-          Додати витрату
+          {initial ? 'Зберегти' : 'Додати витрату'}
         </button>
       )}
     </form>

@@ -4,6 +4,7 @@ import type { Expense } from '@/types'
 
 interface ExpensesListProps {
   items: Expense[]
+  onEdit: (expense: Expense) => void
   onDelete: (expense: Expense) => void
 }
 
@@ -17,13 +18,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Інше': 'bg-gray-100 text-gray-700',
 }
 
-export function ExpensesList({ items, onDelete }: ExpensesListProps) {
+export function ExpensesList({ items, onEdit, onDelete }: ExpensesListProps) {
   return (
     <div className="space-y-2">
       {items.map((expense) => (
         <div
           key={expense.docId || expense.id}
           className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between"
+          onClick={() => onEdit(expense)}
         >
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -43,7 +45,7 @@ export function ExpensesList({ items, onDelete }: ExpensesListProps) {
             </div>
           </div>
           <button
-            onClick={() => onDelete(expense)}
+            onClick={(e) => { e.stopPropagation(); onDelete(expense) }}
             className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-red-500 active:bg-red-50 shrink-0"
           >
             <Trash2 className="w-5 h-5" />

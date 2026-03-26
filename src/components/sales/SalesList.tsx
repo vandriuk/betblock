@@ -5,23 +5,25 @@ import type { Sale } from '@/types'
 interface SalesListProps {
   items: Sale[]
   onTogglePaid: (sale: Sale) => void
+  onEdit: (sale: Sale) => void
   onDelete: (sale: Sale) => void
 }
 
-export function SalesList({ items, onTogglePaid, onDelete }: SalesListProps) {
+export function SalesList({ items, onTogglePaid, onEdit, onDelete }: SalesListProps) {
   return (
     <div className="space-y-2">
       {items.map((sale) => (
         <div
           key={sale.docId || sale.id}
           className="bg-white border border-gray-200 rounded-xl p-4"
+          onClick={() => onEdit(sale)}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold text-gray-900">{sale.customer}</span>
                 <button
-                  onClick={() => onTogglePaid(sale)}
+                  onClick={(e) => { e.stopPropagation(); onTogglePaid(sale) }}
                   className={`px-3 py-1 rounded-full text-xs font-semibold active:scale-95 ${
                     sale.paid
                       ? 'bg-green-100 text-green-700'
@@ -44,7 +46,7 @@ export function SalesList({ items, onTogglePaid, onDelete }: SalesListProps) {
               </div>
             </div>
             <button
-              onClick={() => onDelete(sale)}
+              onClick={(e) => { e.stopPropagation(); onDelete(sale) }}
               className="w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 active:text-red-500 active:bg-red-50 shrink-0"
             >
               <Trash2 className="w-5 h-5" />

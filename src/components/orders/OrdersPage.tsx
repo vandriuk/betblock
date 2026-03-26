@@ -17,6 +17,7 @@ export function OrdersPage() {
   const { orders, products, addItem, updateItem, deleteItem, createSaleFromOrder } = useData()
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<Order | null>(null)
   const [deleting, setDeleting] = useState<Order | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null)
@@ -47,6 +48,13 @@ export function OrdersPage() {
   const handleAdd = async (data: Omit<Order, 'id' | 'docId'>) => {
     await addItem('orders', data)
     setShowForm(false)
+  }
+
+  const handleEdit = async (data: Omit<Order, 'id' | 'docId'>) => {
+    if (!editing) return
+    const id = editing.docId || String(editing.id)
+    await updateItem('orders', id, data)
+    setEditing(null)
   }
 
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
@@ -101,6 +109,7 @@ export function OrdersPage() {
           items={filtered}
           canEdit={canEdit()}
           onStatusChange={handleStatusChange}
+          onEdit={setEditing}
           onDelete={setDeleting}
           onCreateSale={handleCreateSale}
         />
@@ -120,6 +129,21 @@ export function OrdersPage() {
       >
         {user && (
           <OrderForm formId="order-form" products={products} userEmail={user.email} onSubmit={handleAdd} />
+        )}
+      </Sheet>
+
+      <Sheet
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Редагування"
+        footer={
+          <button type="submit" form="order-edit-form" className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all">
+            Зберегти
+          </button>
+        }
+      >
+        {editing && user && (
+          <OrderForm formId="order-edit-form" products={products} userEmail={user.email} initial={editing} onSubmit={handleEdit} />
         )}
       </Sheet>
 
