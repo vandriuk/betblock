@@ -37,6 +37,7 @@ export function AppShell({ activeTab, onTabChange, children }: AppShellProps) {
   const moreItems = [
     { id: 'products' as const, label: 'Продукція' },
     { id: 'movements' as const, label: 'Рух складу' },
+    { id: 'customers' as const, label: 'Клієнти' },
     ...(canViewFinances() ? [
       { id: 'sales' as const, label: 'Продажі' },
       { id: 'expenses' as const, label: 'Витрати' },

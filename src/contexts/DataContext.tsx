@@ -12,6 +12,7 @@ import type {
   Sale,
   Expense,
   InventoryMovement,
+  Customer,
 } from '@/types'
 import type { DocumentData } from 'firebase/firestore'
 
@@ -23,6 +24,7 @@ interface DataContextValue {
   sales: Sale[]
   expenses: Expense[]
   movements: InventoryMovement[]
+  customers: Customer[]
   loading: boolean
   addItem: (collection: string, data: DocumentData) => Promise<string>
   updateItem: (collection: string, docId: string, data: Partial<DocumentData>) => Promise<void>
@@ -46,6 +48,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [sales, setSales] = useState<Sale[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [movements, setMovements] = useState<InventoryMovement[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [lastDeleted, setLastDeleted] = useState<{ collection: string; data: DocumentData } | null>(null)
 
@@ -57,7 +60,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     setLoading(true)
     let loaded = 0
-    const total = 7
+    const total = 8
     const checkDone = () => {
       loaded++
       if (loaded >= total) setLoading(false)
@@ -106,6 +109,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setMovements(items)
         checkDone()
       }, 'date'),
+      subscribeCollection<Customer>('customers', (items) => {
+        setCustomers(items)
+        checkDone()
+      }),
     ]
 
     return () => unsubs.forEach((unsub) => unsub())
@@ -138,7 +145,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       // Find the item data before deleting (for undo)
       let itemData: DocumentData | null = null
       const collections: Record<string, DocumentData[]> = {
-        inventory, products, production, orders, sales, expenses, movements,
+        inventory, products, production, orders, sales, expenses, movements, customers,
       }
       const items = collections[col]
       if (items) {
@@ -177,7 +184,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       toast.error('Помилка при видаленні')
       throw e
     }
-  }, [inventory, products, production, orders, sales, expenses, movements])
+  }, [inventory, products, production, orders, sales, expenses, movements, customers])
 
   const undoDelete = useCallback(async () => {
     if (!lastDeleted) return
@@ -340,6 +347,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         sales,
         expenses,
         movements,
+        customers,
         loading,
         addItem,
         updateItem,

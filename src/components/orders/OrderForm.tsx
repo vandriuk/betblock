@@ -1,18 +1,20 @@
 import { useState, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
-import type { Order, Product } from '@/types'
+import { CustomerSelect } from '@/components/shared/CustomerSelect'
+import type { Order, Product, Customer } from '@/types'
 
 type FormData = Omit<Order, 'id' | 'docId' | 'saleId'>
 
 interface OrderFormProps {
   products: Product[]
+  customers: Customer[]
   userEmail: string
   formId?: string
   initial?: Partial<FormData>
   onSubmit: (data: FormData) => void
 }
 
-export function OrderForm({ products, userEmail, formId, initial, onSubmit }: OrderFormProps) {
+export function OrderForm({ products, customers, userEmail, formId, initial, onSubmit }: OrderFormProps) {
   const [date, setDate] = useState(initial?.date || todayISO())
   const [customer, setCustomer] = useState(initial?.customer || '')
   const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
@@ -52,14 +54,7 @@ export function OrderForm({ products, userEmail, formId, initial, onSubmit }: Or
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Замовник</label>
-        <input
-          type="text"
-          value={customer}
-          onChange={(e) => setCustomer(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-          placeholder="Ім'я або назва"
-          required
-        />
+        <CustomerSelect customers={customers} value={customer} onChange={setCustomer} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

@@ -16,6 +16,16 @@ export interface UserRecord {
   createdAt?: string
 }
 
+// === Customers ===
+
+export interface Customer {
+  id?: number
+  docId?: string
+  name: string
+  phone: string
+  notes: string
+}
+
 // === Inventory ===
 
 export interface InventoryItem {

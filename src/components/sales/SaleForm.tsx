@@ -1,12 +1,14 @@
 import { useState, useMemo, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
 import { AlertTriangle } from 'lucide-react'
-import type { Product, ProductionRecord, Sale } from '@/types'
+import { CustomerSelect } from '@/components/shared/CustomerSelect'
+import type { Product, ProductionRecord, Sale, Customer } from '@/types'
 
 type FormData = Omit<Sale, 'id' | 'docId' | 'orderId' | 'saleId'>
 
 interface SaleFormProps {
   products: Product[]
+  customers: Customer[]
   userEmail: string
   formId?: string
   production?: ProductionRecord[]
@@ -15,7 +17,7 @@ interface SaleFormProps {
   initial?: Partial<FormData>
 }
 
-export function SaleForm({ products, userEmail, formId, production = [], sales = [], onSubmit, initial }: SaleFormProps) {
+export function SaleForm({ products, customers, userEmail, formId, production = [], sales = [], onSubmit, initial }: SaleFormProps) {
   const [date, setDate] = useState(initial?.date || todayISO())
   const [customer, setCustomer] = useState(initial?.customer || '')
   const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
@@ -78,14 +80,7 @@ export function SaleForm({ products, userEmail, formId, production = [], sales =
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Покупець</label>
-        <input
-          type="text"
-          value={customer}
-          onChange={(e) => setCustomer(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-          placeholder="Ім'я або назва"
-          required
-        />
+        <CustomerSelect customers={customers} value={customer} onChange={setCustomer} placeholder="Ім'я або назва" />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">

@@ -12,7 +12,7 @@ import { DateFilter, filterByDate, type DatePreset } from '@/components/shared/D
 import type { Sale } from '@/types'
 
 export function SalesPage() {
-  const { sales, products, production, addItem, updateItem, deleteItem } = useData()
+  const { sales, products, production, customers, addItem, updateItem, deleteItem } = useData()
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Sale | null>(null)
@@ -115,6 +115,7 @@ export function SalesPage() {
           <SaleForm
             formId="sale-form"
             products={products}
+            customers={customers}
             production={production}
             sales={sales}
             userEmail={user.email}
@@ -137,6 +138,7 @@ export function SalesPage() {
           <SaleForm
             formId="sale-edit-form"
             products={products}
+            customers={customers}
             production={production}
             sales={sales}
             userEmail={user.email}

@@ -14,7 +14,7 @@ import { ORDER_STATUSES } from '@/lib/constants'
 import type { Order, OrderStatus } from '@/types'
 
 export function OrdersPage() {
-  const { orders, products, addItem, updateItem, deleteItem, createSaleFromOrder } = useData()
+  const { orders, products, customers, addItem, updateItem, deleteItem, createSaleFromOrder } = useData()
   const { canEdit, user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Order | null>(null)
@@ -128,7 +128,7 @@ export function OrdersPage() {
         }
       >
         {user && (
-          <OrderForm formId="order-form" products={products} userEmail={user.email} onSubmit={handleAdd} />
+          <OrderForm formId="order-form" products={products} customers={customers} userEmail={user.email} onSubmit={handleAdd} />
         )}
       </Sheet>
 
@@ -143,7 +143,7 @@ export function OrdersPage() {
         }
       >
         {editing && user && (
-          <OrderForm formId="order-edit-form" products={products} userEmail={user.email} initial={editing} onSubmit={handleEdit} />
+          <OrderForm formId="order-edit-form" products={products} customers={customers} userEmail={user.email} initial={editing} onSubmit={handleEdit} />
         )}
       </Sheet>
 

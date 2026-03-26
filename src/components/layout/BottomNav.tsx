@@ -1,7 +1,7 @@
 import { BarChart3, Package, Factory, ClipboardList, MoreHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export type TabId = 'dashboard' | 'inventory' | 'products' | 'production' | 'orders' | 'sales' | 'expenses' | 'movements' | 'users'
+export type TabId = 'dashboard' | 'inventory' | 'products' | 'production' | 'orders' | 'sales' | 'expenses' | 'movements' | 'customers' | 'users'
 
 interface BottomNavProps {
   activeTab: TabId
@@ -18,7 +18,7 @@ const TABS = [
 ]
 
 export function BottomNav({ activeTab, onTabChange, onMoreClick }: BottomNavProps) {
-  const isMoreActive = activeTab === 'products' || activeTab === 'sales' || activeTab === 'expenses' || activeTab === 'movements' || activeTab === 'users'
+  const isMoreActive = activeTab === 'products' || activeTab === 'sales' || activeTab === 'expenses' || activeTab === 'movements' || activeTab === 'customers' || activeTab === 'users'
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-safe z-50 md:hidden">
