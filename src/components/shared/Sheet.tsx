@@ -34,7 +34,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
       </div>
 
       {/* Form content — just regular scrolling page */}
-      <div className="px-4 py-5 pb-12">
+      <div className="px-4 py-5 pb-[calc(10vh+env(safe-area-inset-bottom,0px))]">
         {children}
       </div>
     </div>
