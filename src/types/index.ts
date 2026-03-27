@@ -52,6 +52,7 @@ export interface Product {
   name: string
   price: number
   recipe?: RecipeItem[] // recipe for auto-deduction
+  initialStock?: number // starting quantity for existing businesses
 }
 
 // === Inventory Movement Log ===

@@ -16,15 +16,15 @@ export function ProductsPage() {
   const [editing, setEditing] = useState<Product | null>(null)
   const [deleting, setDeleting] = useState<Product | null>(null)
 
-  const handleAdd = async (name: string, price: number, recipe: RecipeItem[]) => {
-    await addItem('products', { name, price, recipe })
+  const handleAdd = async (name: string, price: number, recipe: RecipeItem[], initialStock: number) => {
+    await addItem('products', { name, price, recipe, initialStock })
     setShowForm(false)
   }
 
-  const handleEdit = async (name: string, price: number, recipe: RecipeItem[]) => {
+  const handleEdit = async (name: string, price: number, recipe: RecipeItem[], initialStock: number) => {
     if (!editing) return
     const id = editing.docId || String(editing.id)
-    await updateItem('products', id, { name, price, recipe })
+    await updateItem('products', id, { name, price, recipe, initialStock })
     setEditing(null)
   }
 
@@ -87,7 +87,7 @@ export function ProductsPage() {
           <ProductForm
             formId="product-edit-form"
             onSubmit={handleEdit}
-            initial={{ name: editing.name, price: editing.price, recipe: editing.recipe }}
+            initial={{ name: editing.name, price: editing.price, recipe: editing.recipe, initialStock: editing.initialStock }}
             submitLabel="Зберегти"
             inventory={inventory}
           />

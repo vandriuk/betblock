@@ -28,14 +28,16 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
 
   // Calculate stock for selected product
   const stock = useMemo(() => {
+    const product = products.find((p) => p.name === productName)
+    const initial = product?.initialStock || 0
     const produced = production
       .filter((p) => p.productName === productName)
       .reduce((sum, p) => sum + p.blocks, 0)
     const sold = sales
       .filter((s) => s.productName === productName)
       .reduce((sum, s) => sum + s.blocks, 0)
-    return produced - sold
-  }, [production, sales, productName])
+    return initial + produced - sold
+  }, [products, production, sales, productName])
 
   const overStock = blocks > 0 && blocks > stock
 

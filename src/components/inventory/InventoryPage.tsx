@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { InventoryList } from './InventoryList'
 import { InventoryForm } from './InventoryForm'
 import { AdjustmentForm } from './AdjustmentForm'
+import { ProductStockList } from './ProductStockList'
 import { Sheet } from '@/components/shared/Sheet'
 import { FAB } from '@/components/shared/FAB'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
@@ -11,11 +12,13 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { addDocument } from '@/services/firestore'
 import { todayISO } from '@/lib/utils'
+import { calculateProductStats } from '@/lib/stats'
 import type { InventoryItem } from '@/types'
 
 export function InventoryPage() {
-  const { inventory, addItem, updateItem, deleteItem } = useData()
+  const { inventory, products, production, sales, orders, addItem, updateItem, deleteItem } = useData()
   const { user, canEdit, canViewFinances } = useAuth()
+  const [tab, setTab] = useState<'materials' | 'products'>('materials')
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<InventoryItem | null>(null)
   const [deleting, setDeleting] = useState<InventoryItem | null>(null)
@@ -27,6 +30,11 @@ export function InventoryPage() {
     const q = search.toLowerCase()
     return inventory.filter((i) => i.name.toLowerCase().includes(q))
   }, [inventory, search])
+
+  const productStats = useMemo(
+    () => calculateProductStats(products, production, sales, orders),
+    [products, production, sales, orders]
+  )
 
   const handleAdd = async (data: Omit<InventoryItem, 'id' | 'docId'>) => {
     await addItem('inventory', data)
@@ -67,27 +75,57 @@ export function InventoryPage() {
     <div className="space-y-4">
       <div>
         <h2 className="text-xl font-bold text-gray-900">Склад</h2>
-        <p className="text-sm text-gray-500 mt-0.5">Сировина та матеріали</p>
+        <p className="text-sm text-gray-500 mt-0.5">Сировина та готова продукція</p>
       </div>
 
-      {inventory.length > 0 && (
-        <SearchBar value={search} onChange={setSearch} placeholder="Пошук матеріалу..." />
-      )}
+      {/* Tab switcher */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setTab('materials')}
+          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            tab === 'materials' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 active:bg-gray-200'
+          }`}
+        >
+          Сировина
+        </button>
+        <button
+          onClick={() => setTab('products')}
+          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            tab === 'products' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-600 active:bg-gray-200'
+          }`}
+        >
+          Готова продукція
+        </button>
+      </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState
-          title={inventory.length === 0 ? 'Склад порожній' : 'Нічого не знайдено'}
-          message={inventory.length === 0 ? 'Додайте матеріали' : 'Спробуйте інший пошук'}
-        />
+      {tab === 'materials' ? (
+        <>
+          {inventory.length > 0 && (
+            <SearchBar value={search} onChange={setSearch} placeholder="Пошук матеріалу..." />
+          )}
+
+          {filtered.length === 0 ? (
+            <EmptyState
+              title={inventory.length === 0 ? 'Склад порожній' : 'Нічого не знайдено'}
+              message={inventory.length === 0 ? 'Додайте матеріали' : 'Спробуйте інший пошук'}
+            />
+          ) : (
+            <InventoryList
+              items={filtered}
+              canEdit={canEdit()}
+              showPrices={canViewFinances()}
+              onEdit={setEditing}
+              onDelete={setDeleting}
+              onAdjust={setAdjusting}
+            />
+          )}
+        </>
       ) : (
-        <InventoryList
-          items={filtered}
-          canEdit={canEdit()}
-          showPrices={canViewFinances()}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-          onAdjust={setAdjusting}
-        />
+        productStats.length === 0 ? (
+          <EmptyState title="Немає продукції" message="Спочатку додайте продукцію в розділі 'Продукція'" />
+        ) : (
+          <ProductStockList stats={productStats} />
+        )
       )}
 
       {canEdit() && <FAB onClick={() => setShowForm(true)} />}

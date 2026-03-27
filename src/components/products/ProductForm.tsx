@@ -3,8 +3,8 @@ import { Plus, Trash2 } from 'lucide-react'
 import type { RecipeItem, InventoryItem } from '@/types'
 
 interface ProductFormProps {
-  onSubmit: (name: string, price: number, recipe: RecipeItem[]) => void
-  initial?: { name: string; price: number; recipe?: RecipeItem[] }
+  onSubmit: (name: string, price: number, recipe: RecipeItem[], initialStock: number) => void
+  initial?: { name: string; price: number; recipe?: RecipeItem[]; initialStock?: number }
   submitLabel?: string
   formId?: string
   inventory?: InventoryItem[]
@@ -14,15 +14,17 @@ export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', f
   const [name, setName] = useState(initial?.name || '')
   const [price, setPrice] = useState(initial?.price || 0)
   const [recipe, setRecipe] = useState<RecipeItem[]>(initial?.recipe || [])
+  const [initialStock, setInitialStock] = useState(initial?.initialStock || 0)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     if (!name.trim() || price <= 0) return
-    onSubmit(name.trim(), price, recipe)
+    onSubmit(name.trim(), price, recipe, initialStock)
     if (!initial) {
       setName('')
       setPrice(0)
       setRecipe([])
+      setInitialStock(0)
     }
   }
 
@@ -52,23 +54,38 @@ export function ProductForm({ onSubmit, initial, submitLabel = 'Додати', f
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           placeholder="Шлакоблок"
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">Ціна (₴)</label>
-        <input
-          type="number"
-          value={price || ''}
-          onChange={(e) => setPrice(Number(e.target.value))}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-          placeholder="25"
-          min="0.01"
-          step="0.01"
-          required
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Ціна (₴)</label>
+          <input
+            type="number"
+            inputMode="decimal"
+            value={price || ''}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            placeholder="25"
+            min="0.01"
+            step="0.01"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Початковий залишок</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            value={initialStock || ''}
+            onChange={(e) => setInitialStock(Number(e.target.value))}
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            placeholder="0"
+            min="0"
+          />
+        </div>
       </div>
 
       {/* Recipe section */}

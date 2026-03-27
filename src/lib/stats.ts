@@ -23,7 +23,7 @@ export function calculateProductStats(
       name: product.name,
       produced,
       sold,
-      inStock: produced - sold,
+      inStock: (product.initialStock || 0) + produced - sold,
       inOrders,
     }
   })
