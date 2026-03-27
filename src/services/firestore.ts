@@ -4,6 +4,7 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  setDoc,
   onSnapshot,
   query,
   orderBy,
@@ -102,4 +103,40 @@ export async function deleteDocument(
 
   if (!db) throw new Error('Firestore not configured')
   await deleteDoc(doc(db, collectionName, docId))
+}
+
+// Settings — single document store
+export function subscribeSettings(
+  onData: (settings: Record<string, unknown>) => void
+): () => void {
+  if (DEMO_MODE) {
+    const load = () => {
+      const stored = localStorage.getItem('settings')
+      onData(stored ? JSON.parse(stored) : {})
+    }
+    load()
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'settings') load()
+    }
+    window.addEventListener('demo-data-change', handler)
+    return () => window.removeEventListener('demo-data-change', handler)
+  }
+
+  if (!db) return () => {}
+  const ref = doc(db, 'settings', 'main')
+  return onSnapshot(ref, (snap) => {
+    onData(snap.exists() ? (snap.data() as Record<string, unknown>) : {})
+  })
+}
+
+export async function updateSettings(data: Record<string, unknown>): Promise<void> {
+  if (DEMO_MODE) {
+    const stored = JSON.parse(localStorage.getItem('settings') || '{}')
+    const updated = { ...stored, ...data }
+    localStorage.setItem('settings', JSON.stringify(updated))
+    window.dispatchEvent(new CustomEvent('demo-data-change', { detail: 'settings' }))
+    return
+  }
+  if (!db) throw new Error('Firestore not configured')
+  await setDoc(doc(db, 'settings', 'main'), data, { merge: true })
 }

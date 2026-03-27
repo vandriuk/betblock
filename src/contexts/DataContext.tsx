@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { toast } from 'sonner'
-import { subscribeCollection, addDocument, updateDocument, deleteDocument } from '@/services/firestore'
+import { subscribeCollection, addDocument, updateDocument, deleteDocument, subscribeSettings, updateSettings } from '@/services/firestore'
 import { logEvent } from '@/services/firebase'
 import { DEFAULT_INVENTORY, DEFAULT_PRODUCTS } from '@/lib/constants'
 import { useAuth } from './AuthContext'
@@ -25,6 +25,7 @@ interface DataContextValue {
   expenses: Expense[]
   movements: InventoryMovement[]
   customers: Customer[]
+  settings: Record<string, unknown>
   loading: boolean
   addItem: (collection: string, data: DocumentData) => Promise<string>
   updateItem: (collection: string, docId: string, data: Partial<DocumentData>) => Promise<void>
@@ -33,6 +34,7 @@ interface DataContextValue {
   addProductionWithDeduction: (data: Omit<ProductionRecord, 'id' | 'docId'>) => Promise<{ success: boolean; error?: string }>
   addExpenseWithInventory: (data: Omit<Expense, 'id' | 'docId'>) => Promise<void>
   createSaleFromOrder: (order: Order, userEmail: string) => Promise<void>
+  updateAppSettings: (data: Record<string, unknown>) => Promise<void>
   undoDelete: () => Promise<void>
   lastDeleted: { collection: string; data: DocumentData } | null
 }
@@ -49,6 +51,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [movements, setMovements] = useState<InventoryMovement[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [settings, setSettings] = useState<Record<string, unknown>>({})
   const [loading, setLoading] = useState(true)
   const [lastDeleted, setLastDeleted] = useState<{ collection: string; data: DocumentData } | null>(null)
 
@@ -60,7 +63,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     setLoading(true)
     let loaded = 0
-    const total = 8
+    const total = 9
     const checkDone = () => {
       loaded++
       if (loaded >= total) setLoading(false)
@@ -111,6 +114,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       }, 'date'),
       subscribeCollection<Customer>('customers', (items) => {
         setCustomers(items)
+        checkDone()
+      }),
+      subscribeSettings((s) => {
+        setSettings(s)
         checkDone()
       }),
     ]
@@ -185,6 +192,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
       throw e
     }
   }, [inventory, products, production, orders, sales, expenses, movements, customers])
+
+  const updateAppSettings = useCallback(async (data: Record<string, unknown>) => {
+    try {
+      await updateSettings(data)
+      toast.success('Налаштування збережено')
+    } catch (e) {
+      toast.error('Помилка збереження')
+      throw e
+    }
+  }, [])
 
   const undoDelete = useCallback(async () => {
     if (!lastDeleted) return
@@ -348,6 +365,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         expenses,
         movements,
         customers,
+        settings,
         loading,
         addItem,
         updateItem,
@@ -355,6 +373,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         addProductionWithDeduction,
         addExpenseWithInventory,
         createSaleFromOrder,
+        updateAppSettings,
         undoDelete,
         lastDeleted,
       }}

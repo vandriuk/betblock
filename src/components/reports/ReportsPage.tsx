@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { formatCurrency } from '@/lib/utils'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { TrendingUp, TrendingDown, DollarSign, Factory } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, Factory, Wallet, Pencil } from 'lucide-react'
+import { Sheet } from '@/components/shared/Sheet'
 
 type PeriodType = '6months' | '12months' | 'year'
 
@@ -28,8 +30,13 @@ function getMonthsRange(period: PeriodType): { label: string; from: string; to: 
 }
 
 export function ReportsPage() {
-  const { sales, expenses, production } = useData()
+  const { sales, expenses, production, settings, updateAppSettings } = useData()
+  const { canViewFinances } = useAuth()
   const [period, setPeriod] = useState<PeriodType>('6months')
+  const [showBalanceForm, setShowBalanceForm] = useState(false)
+  const [balanceInput, setBalanceInput] = useState('')
+
+  const initialBalance = (settings.initialBalance as number) || 0
 
   const months = useMemo(() => getMonthsRange(period), [period])
 
@@ -73,6 +80,15 @@ export function ReportsPage() {
     blocks: data.reduce((s, d) => s + d.blocks, 0),
   }), [data])
 
+  const currentBalance = initialBalance + totals.profit
+
+  const handleSaveBalance = async () => {
+    const val = Number(balanceInput)
+    if (isNaN(val)) return
+    await updateAppSettings({ initialBalance: val })
+    setShowBalanceForm(false)
+  }
+
   const PERIODS: { id: PeriodType; label: string }[] = [
     { id: '6months', label: '6 міс' },
     { id: '12months', label: '12 міс' },
@@ -102,6 +118,38 @@ export function ReportsPage() {
           </button>
         ))}
       </div>
+
+      {/* Initial balance card */}
+      {canViewFinances() && (
+        <div className="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                <Wallet className="w-5 h-5 text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Початковий баланс</p>
+                <p className="text-lg font-bold text-primary-700">{formatCurrency(initialBalance)}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { setBalanceInput(String(initialBalance)); setShowBalanceForm(true) }}
+              className="w-11 h-11 flex items-center justify-center rounded-xl text-primary-500 active:bg-primary-100"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="mt-3 pt-3 border-t border-primary-200/50">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Поточний баланс</span>
+              <span className={`text-lg font-bold ${currentBalance >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                {formatCurrency(currentBalance)}
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">= початковий {formatCurrency(initialBalance)} + прибуток {formatCurrency(totals.profit)}</p>
+          </div>
+        </div>
+      )}
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3">
@@ -193,6 +241,46 @@ export function ReportsPage() {
           </table>
         </div>
       </div>
+
+      {/* Balance edit sheet */}
+      <Sheet
+        open={showBalanceForm}
+        onClose={() => setShowBalanceForm(false)}
+        title="Початковий баланс"
+        footer={
+          <button
+            onClick={handleSaveBalance}
+            className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold active:scale-[0.98] transition-all"
+          >
+            Зберегти
+          </button>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Вкажіть суму коштів на момент початку використання системи. Ця сума буде додана до розрахунку поточного балансу.
+          </p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Сума (₴)</label>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={balanceInput}
+              onChange={(e) => setBalanceInput(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              placeholder="0"
+              autoFocus
+            />
+          </div>
+          <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600">
+            <p>Поточний баланс буде:</p>
+            <p className="text-lg font-bold text-gray-900 mt-1">
+              {formatCurrency((Number(balanceInput) || 0) + totals.profit)}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">= {formatCurrency(Number(balanceInput) || 0)} + прибуток {formatCurrency(totals.profit)}</p>
+          </div>
+        </div>
+      </Sheet>
     </div>
   )
 }
