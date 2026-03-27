@@ -25,6 +25,7 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
   const [pallets, setPallets] = useState(initial?.pallets || 0)
   const [price, setPrice] = useState(initial?.price || products[0]?.price || 0)
   const [paid, setPaid] = useState(initial?.paid ?? false)
+  const [submitting, setSubmitting] = useState(false)
 
   // Calculate stock for selected product
   const stock = useMemo(() => {
@@ -47,10 +48,12 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
     if (p) setPrice(p.price)
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!customer.trim() || blocks <= 0 || price <= 0) return
-    onSubmit({
+    if (!customer.trim() || blocks <= 0 || price <= 0 || submitting) return
+    setSubmitting(true)
+    try {
+    await onSubmit({
       date,
       customer: customer.trim(),
       productName,
@@ -65,6 +68,9 @@ export function SaleForm({ products, customers, userEmail, formId, production = 
       setBlocks(0)
       setPallets(0)
       setPaid(false)
+    }
+    } finally {
+      setSubmitting(false)
     }
   }
 

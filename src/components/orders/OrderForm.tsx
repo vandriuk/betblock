@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useMemo, type FormEvent } from 'react'
 import { todayISO } from '@/lib/utils'
+import { AlertTriangle } from 'lucide-react'
 import { CustomerSelect } from '@/components/shared/CustomerSelect'
-import type { Order, Product, Customer } from '@/types'
+import type { Order, Product, ProductionRecord, Sale, Customer } from '@/types'
 
 type FormData = Omit<Order, 'id' | 'docId' | 'saleId'>
 
@@ -11,15 +12,27 @@ interface OrderFormProps {
   userEmail: string
   formId?: string
   initial?: Partial<FormData>
+  production?: ProductionRecord[]
+  sales?: Sale[]
   onSubmit: (data: FormData) => void
 }
 
-export function OrderForm({ products, customers, userEmail, formId, initial, onSubmit }: OrderFormProps) {
+export function OrderForm({ products, customers, userEmail, formId, initial, production = [], sales = [], onSubmit }: OrderFormProps) {
   const [date, setDate] = useState(initial?.date || todayISO())
   const [customer, setCustomer] = useState(initial?.customer || '')
   const [productName, setProductName] = useState(initial?.productName || products[0]?.name || '')
   const [quantity, setQuantity] = useState(initial?.quantity || 0)
   const [notes, setNotes] = useState(initial?.notes || '')
+
+  const stock = useMemo(() => {
+    const product = products.find((p) => p.name === productName)
+    const initial = product?.initialStock || 0
+    const produced = production.filter((p) => p.productName === productName).reduce((sum, p) => sum + p.blocks, 0)
+    const sold = sales.filter((s) => s.productName === productName).reduce((sum, s) => sum + s.blocks, 0)
+    return initial + produced - sold
+  }, [products, production, sales, productName])
+
+  const overStock = quantity > 0 && quantity > stock
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -58,7 +71,10 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Продукція</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Продукція
+            {stock > 0 && <span className="text-xs text-gray-400 ml-1">({stock} шт)</span>}
+          </label>
           <select
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
@@ -77,12 +93,22 @@ export function OrderForm({ products, customers, userEmail, formId, initial, onS
             inputMode="numeric"
             value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className={`w-full px-4 py-3 border rounded-xl text-base focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none ${
+              overStock ? 'border-orange-300 bg-orange-50' : 'border-gray-200'
+            }`}
             min="1"
             required
           />
         </div>
       </div>
+
+      {overStock && (
+        <div className="flex items-start gap-2 bg-orange-50 border border-orange-200 rounded-xl p-3 text-sm text-orange-700">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>Кількість ({quantity}) перевищує залишок ({stock}). Замовлення все ще можливе.</span>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Примітки</label>
         <textarea

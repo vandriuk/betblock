@@ -15,7 +15,10 @@ export function ProductCard({ product, canEdit, onEdit, onDelete }: ProductCardP
       <div className="flex items-center justify-between">
         <div>
           <h4 className="font-semibold text-gray-900">{product.name}</h4>
-          <p className="text-sm text-gray-500 mt-0.5">{formatCurrency(product.price)}</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {formatCurrency(product.price)}
+            {product.initialStock ? <span className="ml-2 text-xs text-gray-400">поч. залишок: {product.initialStock} шт</span> : null}
+          </p>
         </div>
         {canEdit && (
           <div className="flex">

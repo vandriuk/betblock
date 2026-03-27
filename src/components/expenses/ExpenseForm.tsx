@@ -22,6 +22,7 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
   // Material fields (only for "Сировина")
   const [materialName, setMaterialName] = useState(initial?.materialName || inventory[0]?.name || '')
   const [materialQuantity, setMaterialQuantity] = useState(initial?.materialQuantity || 0)
+  const [submitting, setSubmitting] = useState(false)
 
   const isMaterial = category === 'Сировина'
 
@@ -32,10 +33,12 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
     }
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!description.trim() || amount <= 0) return
-    onSubmit({
+    if (!description.trim() || amount <= 0 || submitting) return
+    setSubmitting(true)
+    try {
+    await onSubmit({
       date,
       category,
       description: description.trim(),
@@ -49,6 +52,9 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
       setDescription('')
       setAmount(0)
       setMaterialQuantity(0)
+    }
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -156,9 +162,10 @@ export function ExpenseForm({ userEmail, formId, inventory = [], initial, onSubm
       {!formId && (
         <button
           type="submit"
-          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all"
+          disabled={submitting}
+          className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-50"
         >
-          {initial ? 'Зберегти' : 'Додати витрату'}
+          {submitting ? 'Збереження...' : (initial ? 'Зберегти' : 'Додати витрату')}
         </button>
       )}
     </form>

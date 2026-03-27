@@ -48,6 +48,20 @@ export function DashboardPage() {
 
       <StatsCards stats={productStats} />
       {lowStock.length > 0 && <InventoryAlerts items={lowStock} />}
+
+      {/* Unpaid sales alert */}
+      {canViewFinances() && financialStats.unpaidDebt > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-orange-800 mb-1">Неоплачені продажі</h3>
+          <p className="text-lg font-bold text-orange-700">
+            {financialStats.unpaidDebt.toLocaleString('uk-UA')} ₴
+          </p>
+          <p className="text-xs text-orange-600 mt-1">
+            {sales.filter(s => !s.paid).length} продажів очікують оплати
+          </p>
+        </div>
+      )}
+
       <ProductionChart production={production} />
       {canViewFinances() && <FinanceSummary stats={financialStats} />}
     </div>
